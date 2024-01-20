@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<style type="text/css">
+		@page { margin: 5px; }
+		body { margin: 5px; }
+		.main{
+			width: 200px;
+		}
+		h4{
+			
+			font-size: 14px;
+		}
+		h4,h5,p{
+			text-align: center;
+			margin: 0;
+		}
+		.m-space{
+			margin: 4px 0;
+		}
+		.table-div{
+			display: table;
+			width: 100%;
+		}
+		.table-div > div{
+			display: table-cell;
+			vertical-align: middle;
+			padding: 2px;
+		}
+		.w-50{
+			width: 50%;
+		}
+		.w-16{
+			width: 16.66%;
+		}
+		td,span,p{
+			font-size: 12px;
+		}
+		.text-right{
+			text-align: right;
+		}
+		.name{
+			text-align: left;
+		}
+	</style>
+</head>
+<body>
+	<div id="printableArea" class="main">
+		<h4>
+			M/s New Nabaratna Hospitality Pvt. Ltd.
+		</h4>
+		<p class="m-space">
+			AC Executive Lounge, Guwahati Railway Station, PF No. 1
+		</p>
+		<h5>
+			GSTIN: 18AAICN4763E1ZA
+		</h5>
+		<div class="table-div">
+			<div class="w-50">
+				<span class="text">Bill No: 898989889</span>
+			</div>
+			<div class="w-50 text-right">
+				<span class="text">Date: <?php echo date("d-m-Y"); ?></span>
+			</div>
+		</div>
+		<span class="name">Name : Dipanshu Chauhan</span>
+		<div class="table-div">
+			<div class="w-50">
+				<span class="text">PNR/ID No.: 89898989</span>
+			</div>
+			<div class="w-50">
+				<span class="text text-right">Mobile: 909898989</span>
+			</div>
+		</div>
+		<div class="table-div" style="margin-bottom: 20px;">
+			<div class="w-50">
+				<span class="text">In Time: <b>8:00 PM</b></span>
+			</div>
+			<div class="w-50">
+				<span class="text">Out Time: <b>9:00 PM</b></span>
+			</div>
+		</div>
+		<table style="width:100%;margin: -1;" border="1" cellpadding="4" cellspacing="0" >
+			<tr>
+				<td class="w-46">Description</td>
+				<td class="w-20">Fee Type</td>
+				<td class="w-16">Quantity</td>
+				<td class="w-16">Amount</td>
+			</tr>
+			<tr>
+				<td class="w-46">For 1st hours or part there of</td>
+				<td class="w-20">Adult 30/- Perpersal</td>
+				<td class="w-16" rowspan="2">3</td>
+				<td class="w-16">90</td>
+			</tr>
+			<tr>
+				<td class="w-46">Per Exterded hours or part there of</td>
+				<td class="w-20">Adult 20/- Perpersal</td>
+				<td class="w-16">{{$print_data->adult_other_hour_amount}}</td>
+			</tr>
+			<tr>
+				<td class="w-46">1st hours of part there of</td>
+				<td class="w-20">Age 5 to 12, 20/ Perchilores</td>
+				<td class="w-16" rowspan="2">{{$print_data->no_of_children}}</td>
+				<td class="w-16">{{$print_data->children_first_hour_amount}}</td>
+			</tr>
+			<tr>
+				<td class="w-46">Per Exterded hours or part there of</td>
+				<td class="w-20">Age 5 to 12, 10/ Perchilores</td>
+				<td class="w-16">{{$print_data->children_other_hour_amount}}</td>
+			</tr>
+			<tr>
+				<td class="w-46">Age Below 5 Years</td>
+				<td class="w-20">Free</td>
+				<td class="w-16">{{$print_data->no_of_baby_staff}}</td>
+				<td class="w-16">--</td>
+			</tr>
+			<tr>
+				<td class="w-46" colspan="2"><b>Total</b></td>
+				<td class="w-20">{{$print_data->total_member}}</td>
+				<td class="w-16">{{$print_data->paid_amount}}</td>
+			</tr>
+		</table>
+		<div style="margin-top: 20px;text-align: right;">
+			<span style="text-align:right;font-weight: bold;">E.&.O.E</span>
+		</div>
+		<div style="margin-top:10px;text-align:center;">
+
+			<p>
+				<b>*Note : Passengers must protect their own Mobile and luggage.</b>
+			</p>
+			<p style="margin-top:10px;font-size: 16px;">
+				<strong>Thanks Visit Again</strong>
+			</p>
+		</div>
+		
+	</div>
+	<script type="text/javascript">
+		window.onload = function(e){ 
+		    var printContents = document.getElementById("printableArea").innerHTML;
+			var originalContents = document.body.innerHTML;
+			document.body.innerHTML = printContents;
+			window.print();
+			document.body.innerHTML = originalContents; 
+		}
+	</script>
+</body>
+</html>
