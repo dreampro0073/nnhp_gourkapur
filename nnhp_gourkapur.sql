@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Jan 20, 2024 at 09:45 AM
+-- Generation Time: Jan 21, 2024 at 03:29 PM
 -- Server version: 5.7.32
 -- PHP Version: 7.4.12
 
@@ -37,10 +37,10 @@ CREATE TABLE `double_beds` (
 --
 
 INSERT INTO `double_beds` (`id`, `e_no`, `status`) VALUES
-(1, '1', 0),
+(1, '1', 1),
 (2, '2', 0),
 (3, '3', 0),
-(4, '4', 0),
+(4, '4', 1),
 (5, '5', 0),
 (6, '6', 0),
 (7, '7', 0),
@@ -84,6 +84,7 @@ CREATE TABLE `entries` (
   `delete_time` timestamp NULL DEFAULT NULL,
   `checkout_status` tinyint(1) NOT NULL DEFAULT '0',
   `added_by` int(11) NOT NULL DEFAULT '0',
+  `user_session_id` varchar(255) DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -92,11 +93,12 @@ CREATE TABLE `entries` (
 -- Dumping data for table `entries`
 --
 
-INSERT INTO `entries` (`id`, `unique_id`, `type`, `e_ids`, `name`, `pnr_uid`, `mobile_no`, `train_no`, `address`, `nos`, `date`, `check_in`, `check_out`, `shift`, `hours_occ`, `paid_amount`, `penality`, `pay_type`, `remarks`, `status`, `deleted`, `delete_by`, `delete_time`, `checkout_status`, `added_by`, `updated_at`, `created_at`) VALUES
-(1, 1705738879, 0, '0', 'Dipa', 'q1212', '1212', NULL, NULL, NULL, '2024-01-20', '13:51:19', '15:51:19', 'A', 2, NULL, NULL, 1, 'asas', 0, 0, 0, NULL, 0, 13, '2024-01-20 08:21:19', '2024-01-20 08:21:19'),
-(2, 1705740716, 0, '18,22', 'Dipanshu', '2121asas', '90909090', NULL, NULL, NULL, '2024-01-20', '14:21:56', '16:21:56', 'B', 2, NULL, NULL, 1, 'asas', 0, 0, 0, NULL, 0, 13, '2024-01-20 08:51:56', '2024-01-20 08:51:56'),
-(3, 1705741038, 0, '1,2', 'asas', 'STat', '1212', NULL, NULL, NULL, '2024-01-20', '14:27:00', '14:27:00', 'B', 24, NULL, NULL, 1, 'asas', 0, 0, 0, NULL, 0, 13, '2024-01-20 09:04:14', '2024-01-20 08:57:18'),
-(4, 1705742261, 0, '4,3,10', 'DIabsh', '9999', '121212', NULL, NULL, NULL, '2024-01-20', '14:47:00', '14:47:00', 'B', 24, '2397', NULL, 1, 'asasas', 0, 0, 0, NULL, 0, 13, '2024-01-20 09:18:11', '2024-01-20 09:17:41');
+INSERT INTO `entries` (`id`, `unique_id`, `type`, `e_ids`, `name`, `pnr_uid`, `mobile_no`, `train_no`, `address`, `nos`, `date`, `check_in`, `check_out`, `shift`, `hours_occ`, `paid_amount`, `penality`, `pay_type`, `remarks`, `status`, `deleted`, `delete_by`, `delete_time`, `checkout_status`, `added_by`, `user_session_id`, `updated_at`, `created_at`) VALUES
+(1, 1705844193, 1, '1,3,4', 'Dipanshu', 'UK898989', '7351334717', NULL, NULL, NULL, '2024-01-21', '19:06:00', '19:06:00', 'B', 24, '2397', NULL, 2, 'Demo', 0, 0, 0, NULL, 0, 13, '1705844143', '2024-01-21 13:37:09', '2024-01-21 13:36:33'),
+(2, 1705845552, 1, '11,8', 'DIpanshu', '898989', '909090', NULL, NULL, NULL, '2024-01-21', '19:29:12', '01:29:12', 'B', 6, '598', NULL, 2, NULL, 0, 0, 0, NULL, 0, 13, '1705844143', '2024-01-21 13:59:12', '2024-01-21 13:59:12'),
+(3, 1705846618, 1, '2,6', 'ghghgh', '8989', '77878', NULL, NULL, NULL, '2024-01-21', '19:46:58', '19:46:58', 'B', 24, '1598', NULL, 1, 'gg', 0, 0, 0, NULL, 0, 13, '1705844143', '2024-01-21 14:16:58', '2024-01-21 14:16:58'),
+(5, 1705846840, 2, '1,3', 'dfdfd', '89898', '6767', NULL, NULL, NULL, '2024-01-21', '19:50:40', '07:50:40', 'B', 12, '1198', NULL, 2, 'fgfgfg', 0, 0, 0, NULL, 0, 13, '1705844143', '2024-01-21 14:20:40', '2024-01-21 14:20:40'),
+(6, 1705846881, 3, '1,4', 'DIpanshu', '1212', '99090', NULL, NULL, NULL, '2024-01-21', '19:51:21', '01:51:21', 'B', 6, '1198', NULL, 1, 'asas', 0, 0, 0, NULL, 0, 13, '1705844143', '2024-01-21 14:21:21', '2024-01-21 14:21:21');
 
 -- --------------------------------------------------------
 
@@ -113,6 +115,7 @@ CREATE TABLE `penalties` (
   `date` date DEFAULT NULL,
   `current_time` time DEFAULT NULL,
   `added_by` int(11) NOT NULL DEFAULT '0',
+  `user_session_id` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -134,17 +137,17 @@ CREATE TABLE `pods` (
 --
 
 INSERT INTO `pods` (`id`, `e_no`, `status`) VALUES
-(1, '1', 0),
-(2, '2', 0),
-(3, '3', 0),
-(4, '4', 0),
+(1, '1', 1),
+(2, '2', 1),
+(3, '3', 1),
+(4, '4', 1),
 (5, '5', 0),
-(6, '6', 0),
+(6, '6', 1),
 (7, '7', 0),
-(8, '8', 0),
+(8, '8', 1),
 (9, '9', 0),
 (10, '10', 0),
-(11, '11', 0),
+(11, '11', 1),
 (12, '12', 0),
 (13, '13', 0),
 (14, '14', 0),
@@ -190,9 +193,9 @@ CREATE TABLE `single_cabins` (
 --
 
 INSERT INTO `single_cabins` (`id`, `e_no`, `status`) VALUES
-(1, '1', 0),
+(1, '1', 1),
 (2, '2', 0),
-(3, '3', 0),
+(3, '3', 1),
 (4, '4', 0),
 (5, '5', 0),
 (6, '6', 0),
@@ -227,6 +230,7 @@ INSERT INTO `single_cabins` (`id`, `e_no`, `status`) VALUES
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `enc_id` varchar(255) DEFAULT NULL,
+  `session_id` varchar(255) DEFAULT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(200) NOT NULL,
   `mobile` varchar(50) DEFAULT NULL,
@@ -247,9 +251,29 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `enc_id`, `name`, `email`, `mobile`, `address`, `password`, `password_check`, `profile_pic`, `priv`, `active`, `remember_token`, `api_token`, `last_login`, `updated_at`, `created_at`) VALUES
-(1, '0011', 'Admin', 'admin', '343434343', 'ss', '$2y$10$m6OJfIAp11mqieShJG1X9uu.LuyNLR4o./TKk5iHse3eCXYnGMfoi', 'dipanshu@135', '', 1, 0, '2Gbv4XV87fw6eFJMWKGF5FDLxpgZf1xFUDDC6CJoraR79plUNozbA24NKnCs', '$2y$10$AqNLf6dmiAbUrs71HfIV0.7Qk/rCZsi6mRbtUJuwELDLsBYFItlYW', '2019-09-24 13:30:29', '2024-01-20 07:22:51', NULL),
-(13, '0011', 'Admin', 'dipanshu', '343434343', 'ss', '$2y$10$m6OJfIAp11mqieShJG1X9uu.LuyNLR4o./TKk5iHse3eCXYnGMfoi', 'dipanshu@135', '', 2, 0, '2Gbv4XV87fw6eFJMWKGF5FDLxpgZf1xFUDDC6CJoraR79plUNozbA24NKnCs', '$2y$10$AqNLf6dmiAbUrs71HfIV0.7Qk/rCZsi6mRbtUJuwELDLsBYFItlYW', '2019-09-24 13:30:29', '2024-01-20 07:22:51', NULL);
+INSERT INTO `users` (`id`, `enc_id`, `session_id`, `name`, `email`, `mobile`, `address`, `password`, `password_check`, `profile_pic`, `priv`, `active`, `remember_token`, `api_token`, `last_login`, `updated_at`, `created_at`) VALUES
+(1, '0011', NULL, 'Admin', 'admin', '343434343', 'ss', '$2y$10$m6OJfIAp11mqieShJG1X9uu.LuyNLR4o./TKk5iHse3eCXYnGMfoi', 'dipanshu@135', '', 1, 0, '2Gbv4XV87fw6eFJMWKGF5FDLxpgZf1xFUDDC6CJoraR79plUNozbA24NKnCs', '$2y$10$AqNLf6dmiAbUrs71HfIV0.7Qk/rCZsi6mRbtUJuwELDLsBYFItlYW', '2019-09-24 13:30:29', '2024-01-20 07:22:51', NULL),
+(13, '0011', '1705844143', 'Admin', 'dipanshu', '343434343', 'ss', '$2y$10$m6OJfIAp11mqieShJG1X9uu.LuyNLR4o./TKk5iHse3eCXYnGMfoi', 'dipanshu@135', '', 2, 0, '0se3brJeLUkhHWi3r8TBU85Wyjr4jDOxjqrl0FDj7jTsCRVyv00i8Mphcycf', '$2y$10$AqNLf6dmiAbUrs71HfIV0.7Qk/rCZsi6mRbtUJuwELDLsBYFItlYW', '2019-09-24 13:30:29', '2024-01-21 13:35:43', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_sessions`
+--
+
+CREATE TABLE `user_sessions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `session_id` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `user_sessions`
+--
+
+INSERT INTO `user_sessions` (`id`, `user_id`, `session_id`, `created_at`) VALUES
+(1, 13, '1705844143', '2024-01-21 13:35:43');
 
 --
 -- Indexes for dumped tables
@@ -293,6 +317,12 @@ ALTER TABLE `users`
 ALTER TABLE `users` ADD FULLTEXT KEY `name` (`name`);
 
 --
+-- Indexes for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -306,7 +336,7 @@ ALTER TABLE `double_beds`
 -- AUTO_INCREMENT for table `entries`
 --
 ALTER TABLE `entries`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `penalties`
@@ -331,6 +361,12 @@ ALTER TABLE `single_cabins`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -36,7 +36,7 @@ Route::group(['middleware'=>'auth'],function(){
 		Route::post('/reset-password',[UserController::class,'updatePassword']);
 		
 		Route::group(['prefix'=>"entries"], function(){
-			Route::get('/',[EntryController::class,'index']);
+			Route::get('/{type}',[EntryController::class,'index']);
 			Route::get('/print/{id?}', [EntryController::class,'printPost']);
 			
 		});		
@@ -54,9 +54,9 @@ Route::group(['middleware'=>'auth'],function(){
 Route::group(['prefix'=>"api"], function(){
 	
 	Route::group(['prefix'=>"entries"], function(){
-		Route::post('/init',[EntryController::class,'initEntry']);
+		Route::post('/init/{type}',[EntryController::class,'initEntry']);
 		Route::post('/edit-init',[EntryController::class,'editEntry']);
-		Route::post('/store',[EntryController::class,'store']);
+		Route::post('/store/{type}',[EntryController::class,'store']);
 		Route::post('/cal-check',[EntryController::class,'calCheck']);
 		Route::post('/checkout-init',[EntryController::class,'checkoutInit']);
 		Route::post('/checkout-store',[EntryController::class,'checkoutStore']);

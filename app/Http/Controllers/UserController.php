@@ -58,6 +58,18 @@ class UserController extends Controller {
 
 			
             if(Auth::attempt($cre)){
+
+                $session_id = strtotime("now");
+
+                DB::table("user_sessions")->insert([
+                    'user_id' => Auth::id(),
+                    'session_id' => $session_id,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+
+                DB::table("users")->where('id',Auth::id())->update([
+                    'session_id' => $session_id,
+                ]);
                 
                 return Redirect::to('/admin/entries');
 

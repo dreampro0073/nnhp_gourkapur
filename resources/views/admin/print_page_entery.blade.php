@@ -58,14 +58,24 @@
 			GSTIN: 18AAICN4763E1ZA
 		</h5>
 		<h5>
-			LOCKER
+			@if($print_data->type == 1)
+				PODS
+			@endif
+
+			@if($print_data->type ==2)
+				Single Suit Cabins
+			@endif
+
+			@if($print_data->type == 3)
+				Double Beds
+			@endif
 		</h5>
 		<div class="table-div">
 			<div class="w-50">
 				<span class="text">Bill No: <b>{{ $print_data->unique_id }}</b></span>
 			</div>
 			<div class="w-50">
-				<span class="text">Date: <b><?php // echo date("d-m-Y"); ?></b></span>
+				<span class="text">Date: <b><?php echo date("d-m-Y"); ?></b></span>
 			</div>
 		</div>
 		<div class="table-div">
@@ -79,7 +89,10 @@
 		</div>
 		<div class="table-div">
 			<div class="w-50">
-				<span class="text">Pods: <b>{{ $print_data->e_ids }}</b></span>
+				<span class="text">No: <b>{{ $print_data->e_ids }}</b></span>
+			</div>
+			<div class="w-50">
+				<span class="text">Hours: <b>{{ $print_data->hours_occ }}</b></span>
 			</div>
 
 			
@@ -92,16 +105,16 @@
 				<span class="text">Paid Amount: <b>{{ $print_data->paid_amount }}</b></span>
 			</div>
 		</div>
-		<div style="margin-bottom:10px;">
-			<div>
+		<div class="table-div">
+			<div class="w-50">
 				<span class="text">In Time: <b>{{date("h:i a",strtotime($print_data->check_in))}}</b></span>
 			</div>
-			<div>
+			<div class="w-50">
 				<span class="text">Out Time: <b>{{date("h:i a",strtotime($print_data->check_out))}}</b></span>
 			</div>
 		</div>
 		<div style="margin-top:10px;text-align: right;">
-			<!-- <span style="text-align:right;font-weight: bold;">E.&.O.E</span> -->
+			
 			<span style="text-align:right;font-weight: bold;">** Non Refundable **</span>
 		</div>
 		<div style="margin-top:10px;text-align:center;">

@@ -8,7 +8,7 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
         no_of_day:'',
         locker_id:'',
     };
-
+    $scope.type = 0;
     $scope.filter = {};
 
     $scope.entry_id = 0;
@@ -16,17 +16,22 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
     $scope.check_shift = "";
     $scope.pay_types = [];
     $scope.avail_pods = [];
+    $scope.avail_cabins = [];
+    $scope.avail_beds = [];
     $scope.hours = [];
 
     $scope.sl_pods = [];
+    $scope.sl_cabins = [];
+    $scope.sl_beds = [];
     
     $scope.init = function () {
-        
-        DBService.postCall($scope.filter, '/api/entries/init').then((data) => {
+        DBService.postCall($scope.filter, '/api/entries/init/'+$scope.type).then((data) => {
             if (data.success) {
                 $scope.pay_types = data.pay_types;
                 $scope.entries = data.entries;
                 $scope.avail_pods = data.avail_pods;
+                $scope.avail_cabins = data.avail_cabins;
+                $scope.avail_beds = data.avail_beds;
                 $scope.hours = data.hours;
             }
         });
@@ -86,14 +91,37 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
     }
 
     $scope.onSubmit = function () {
-        $scope.loading = true;
-        if($scope.sl_pods.length == 0){
-            alert('Please select at least one locker');
+
+        $scope.formData.type = $scope.type;
+       
+        if($scope.type == 1 && $scope.sl_pods.length == 0 ){
+            alert('Please select at least one pods');
             return;
         }
 
-        $scope.formData.sl_pods = $scope.sl_pods;
-        DBService.postCall($scope.formData, '/api/entries/store').then((data) => {
+        if($scope.type == 2 && $scope.sl_cabins.length == 0 ){
+            alert('Please select at least one single cabins');
+            return;
+        }
+
+        if($scope.type == 3 && $scope.sl_beds.length == 0 ){
+            alert('Please select at least one double bed');
+            return;
+        }
+
+        $scope.loading = true;
+
+        if($scope.type == 1){
+            $scope.formData.sl_pods = $scope.sl_pods;
+        }
+        if($scope.type == 2){
+            $scope.formData.sl_cabins = $scope.sl_cabins;
+        }
+        if($scope.type == 3){
+            $scope.formData.sl_beds = $scope.sl_beds;
+        }
+
+        DBService.postCall($scope.formData, '/api/entries/store/'+$scope.type).then((data) => {
             if (data.success) {
                 $scope.loading = false;
 
@@ -104,8 +132,11 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
                     mobile:"",
                     paid_amount:0,
                     hours_occ:'',
-                    locker_id:'',
+                    
                 };
+                $scope.sl_pods = [];
+                $scope.sl_beds = [];
+                $scope.sl_cabins = [];
                 $scope.init();
                 setTimeout(function(){
                     window.open(base_url+'/admin/entries/print/'+data.id,'_blank');
@@ -141,11 +172,7 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
 
   
     $scope.changeAmount = () => {
-        // console.log('hello');
-
         $scope.formData.total_amount = 0;
-
-
         if($scope.formData.hours_occ == 6){
            $scope.formData.total_amount= $scope.sl_pods.length*299;
         }else if($scope.formData.hours_occ == 12){
@@ -153,11 +180,31 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
         }else if($scope.formData.hours_occ == 24){
            $scope.formData.total_amount= $scope.sl_pods.length*799;
         }
-    
+        $scope.formData.balance_amount = $scope.formData.total_amount - $scope.formData.paid_amount;   
+    }
 
-        $scope.formData.balance_amount = $scope.formData.total_amount - $scope.formData.paid_amount;
+    $scope.changeAmountCabin = () => {
+        $scope.formData.total_amount = 0;
+        if($scope.formData.hours_occ == 6){
+           $scope.formData.total_amount= $scope.sl_cabins.length*399;
+        }else if($scope.formData.hours_occ == 12){
+           $scope.formData.total_amount= $scope.sl_cabins.length*599;
+        }else if($scope.formData.hours_occ == 24){
+           $scope.formData.total_amount= $scope.sl_cabins.length*1199;
+        }
+        $scope.formData.balance_amount = $scope.formData.total_amount - $scope.formData.paid_amount;   
+    }
 
-       
+    $scope.changeAmountBed = () => {
+        $scope.formData.total_amount = 0;
+        if($scope.formData.hours_occ == 6){
+           $scope.formData.total_amount= $scope.sl_beds.length*599;
+        }else if($scope.formData.hours_occ == 12){
+           $scope.formData.total_amount= $scope.sl_beds.length*899;
+        }else if($scope.formData.hours_occ == 24){
+           $scope.formData.total_amount= $scope.sl_beds.length*1699;
+        }
+        $scope.formData.balance_amount = $scope.formData.total_amount - $scope.formData.paid_amount;   
     }
 
     $scope.delete = function (id) {
@@ -169,14 +216,34 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
         }
     }
 
-    $scope.insPods = (locker_id) => {
-        let idx = $scope.sl_pods.indexOf(locker_id);
+    $scope.insPods = (pod_id) => {
+        let idx = $scope.sl_pods.indexOf(pod_id);
         if(idx == -1){
-            $scope.sl_pods.push(locker_id);
+            $scope.sl_pods.push(pod_id);
         }else{
             $scope.sl_pods.splice(idx,1);
         }
         $scope.changeAmount();
+    }
+
+    $scope.insCabins = (cabin_id) => {
+        let idx = $scope.sl_cabins.indexOf(cabin_id);
+        if(idx == -1){
+            $scope.sl_cabins.push(cabin_id);
+        }else{
+            $scope.sl_cabins.splice(idx,1);
+        }
+        $scope.changeAmountCabin();
+    }
+
+    $scope.insBeds = (bed_id) => {
+        let idx = $scope.sl_beds.indexOf(bed_id);
+        if(idx == -1){
+            $scope.sl_beds.push(bed_id);
+        }else{
+            $scope.sl_beds.splice(idx,1);
+        }
+        $scope.changeAmountBed();
     }
 });
 

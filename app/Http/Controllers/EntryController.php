@@ -13,14 +13,30 @@ use App\Models\Massage, App\Models\User;
 use App\Models\Entry;
 
 class EntryController extends Controller {	
-	public function index(){
+	public function index($type){
+		$sidebar = 'pods';
+        $subsidebar = 'pods';
+
+		if($type == 2){
+			$sidebar = 'scabins';
+           	$subsidebar = 'scabins';
+		}
+
+		if($type == 3){
+			$sidebar = 'beds';
+           	$subsidebar = 'beds';
+		}
+
 		return view('admin.entries.index', [
-            "sidebar" => "entries",
-            "subsidebar" => "entries",
+            "sidebar" =>$sidebar,
+            "subsidebar" => $subsidebar,
+            "type" => $type,
         ]);
 	}
 	
-	public function initEntry(Request $request){
+	public function initEntry(Request $request,$type){
+		
+
 		$entries = DB::table('entries')->select('entries.*','users.name as username')->leftJoin('users','users.id','=','entries.delete_by');
 		if($request->unique_id){
 			$entries = $entries->where('entries.unique_id', 'LIKE', '%'.$request->unique_id.'%');
@@ -39,7 +55,8 @@ class EntryController extends Controller {
 		if(Auth::user()->priv != 1){
 			$entries = $entries->where('deleted',0);
 		}
-		$entries = $entries->where('checkout_status', 0);
+		// $entries = $entries->where('type',$type)->where('checkout_status', 0);
+		$entries = $entries->where('type',$type);
 		$entries = $entries->orderBy('id', "DESC")->get();
 
 
@@ -47,12 +64,16 @@ class EntryController extends Controller {
 		$hours = Entry::hours();
 		$show_pay_types = Entry::showPayTypes();
 		$avail_pods = Entry::getAvailPods();
+		$avail_cabins = Entry::getAvailSinCabins();
+		$avail_beds = Entry::getAvailBeds();
 
 		$data['success'] = true;
 		$data['entries'] = $entries;
 		$data['pay_types'] = $pay_types;
 		$data['hours'] = $hours;
 		$data['avail_pods'] = $avail_pods;
+		$data['avail_cabins'] = $avail_cabins;
+		$data['avail_beds'] = $avail_beds;
 
 		return Response::json($data, 200, []);
 	}
@@ -90,7 +111,7 @@ class EntryController extends Controller {
 		return Response::json($data, 200, []);
 	}
 
-	public function store(Request $request){
+	public function store(Request $request,$type){
 
 		$check_shift = Entry::checkShift();
 
@@ -145,7 +166,7 @@ class EntryController extends Controller {
 			$entry->pay_type = $request->pay_type;
 			$entry->remarks = $request->remarks;
 			$entry->shift = $check_shift;
-			$entry->type = 1;
+			$entry->type = $type;
 			$entry->save();
 			$no_of_min = $request->hours_occ*60;
 
@@ -155,12 +176,30 @@ class EntryController extends Controller {
         	$date = Entry::getPDate();
 	        $entry->date = $date;
 			$entry->added_by = Auth::id();
+			$entry->user_session_id = Auth::user()->session_id;
 
-			$sl_pods = $request->sl_pods;
-			$entry->e_ids = implode(',', $sl_pods);
+
+			if($type ==1){
+				$sl_pods = $request->sl_pods;
+				$entry->e_ids = implode(',', $sl_pods);
+				DB::table("pods")->whereIn('id',$sl_pods)->update(['status'=>1]);
+			}
+			if($type == 2){
+				$sl_cabins = $request->sl_cabins;
+				$entry->e_ids = implode(',', $sl_cabins);
+				DB::table("single_cabins")->whereIn('id',$sl_cabins)->update(['status'=>1]);
+			}
+
+			if($type == 3){
+				$sl_beds = $request->sl_beds;
+				$entry->e_ids = implode(',', $sl_beds);
+				DB::table("double_beds")->whereIn('id',$sl_beds)->update(['status'=>1]);
+			}
+
+
+			
 			$entry->save();
 
-			DB::table("pods")->whereIn('id',$sl_pods)->update(['status'=>1]);
 
 			$data['id'] = $entry->id;
 			$data['success'] = true;
@@ -176,7 +215,7 @@ class EntryController extends Controller {
 	public function printPost($id = 0){
 
         $print_data = DB::table('entries')->where('id', $id)->first();
-        return view('admin.print_page_locker', compact('print_data'));
+        return view('admin.print_page_entery', compact('print_data'));
 	}
 
 
@@ -291,6 +330,7 @@ class EntryController extends Controller {
 			'shift' => $check_shift,
 			'date' =>$date,
 			'added_by' =>Auth::id(),
+			'user_session_id' => Auth::users()->session_id,
 			'current_time' => date("H:i:s"),
 			'created_at' => date('Y-m-d H:i:s'),
 		]);

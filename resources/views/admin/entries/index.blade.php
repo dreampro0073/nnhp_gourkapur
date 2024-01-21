@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @section('main')
-    <div class="main" ng-controller="entryCtrl" ng-init="init();"> 
+    <div class="main" ng-controller="entryCtrl" ng-init="type = {{$type}};init();"> 
         @include('admin.entries.add')
         <div class="card shadow mb-4 p-4">    
             <div class="filters" style="margin:24px 0;">
@@ -83,7 +83,7 @@
                             <td>
                                 <a href="javascript:;" ng-click="checkoutLoker(item.id)" class="btn btn-danger btn-sm">Checkout</a>
                                 <a href="javascript:;" ng-click="edit(item.id)" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="{{url('/admin/locker/print')}}/@{{item.id}}" class="btn btn-success btn-sm" target="_blank">Print</a>
+                                <a href="{{url('/admin/entries/print')}}/@{{item.id}}" class="btn btn-success btn-sm" target="_blank">Print</a>
                                 @if(Auth::id() !=1)
                                 <button type="button" ng-click="delete(item.id)" class="btn btn-danger btn-sm">Delete</button>
                                 @endif

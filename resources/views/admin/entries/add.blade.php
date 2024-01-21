@@ -53,15 +53,42 @@
                                 <option ng-repeat="item in pay_types" value="@{{item.value}}">@{{ item.label}}</option>
                             </select>
                         </div>
-                        <div class="col-md-12 form-group" ng-if="entry_id == 0">
+                       
+                        <div class="col-md-12 form-group" ng-if="entry_id == 0 && type == 1">
                             <label>Available PODS</label>
                             <br>
                             <span ng-repeat="item in avail_pods">
                                <label> <input type="checkbox" ng-click="insPods(item.id)">&nbsp;@{{item.e_no}}</label> &nbsp;&nbsp;
                             </span>
                         </div>
-                        <div class="col-md-3 form-group" ng-if="entry_id != 0">
+                        <div class="col-md-3 form-group" ng-if="entry_id != 0 && type == 1">
                             <label>PODS</label>
+                            <input type="text" ng-model="formData.e_ids" class="form-control" required readonly />
+
+                        </div>
+
+                        <div class="col-md-12 form-group" ng-if="entry_id == 0 && type == 2">
+                            <label>Available Single Suit Cabins</label>
+                            <br>
+                            <span ng-repeat="item in avail_cabins">
+                               <label> <input type="checkbox" ng-click="insCabins(item.id)">&nbsp;@{{item.e_no}}</label> &nbsp;&nbsp;
+                            </span>
+                        </div>
+                        <div class="col-md-3 form-group" ng-if="entry_id != 0 && type == 2">
+                            <label>Single Suit Cabins</label>
+                            <input type="text" ng-model="formData.e_ids" class="form-control" required readonly />
+
+                        </div>
+
+                        <div class="col-md-12 form-group" ng-if="entry_id == 0 && type == 3">
+                            <label>Available Double Beds</label>
+                            <br>
+                            <span ng-repeat="item in avail_beds">
+                               <label> <input type="checkbox" ng-click="insBeds(item.id)">&nbsp;@{{item.e_no}}</label> &nbsp;&nbsp;
+                            </span>
+                        </div>
+                        <div class="col-md-3 form-group" ng-if="entry_id != 0 && type == 3">
+                            <label>Double Beds</label>
                             <input type="text" ng-model="formData.e_ids" class="form-control" required readonly />
 
                         </div>

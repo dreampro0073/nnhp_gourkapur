@@ -23,6 +23,14 @@ class Entry extends Model
         return DB::table('pods')->where('status',0)->get();
     }
 
+    public static function getAvailSinCabins(){
+        return DB::table('single_cabins')->where('status',0)->get();
+    }
+
+    public static function getAvailBeds(){
+        return DB::table('double_beds')->where('status',0)->get();
+    }
+
     public static function showPayTypes(){
         return [1=>'Cash',2=>"UPI"];
     }
@@ -50,7 +58,6 @@ class Entry extends Model
         $c_shift =strtotime("22:00:00");
 
         $current_time = strtotime(date("H:i:s"));
-        // $current_time = "03:09:00";
 
         if($current_time > $a_shift && $current_time < $b_shift){
 
@@ -91,18 +98,18 @@ class Entry extends Model
         $p_date = Entry::getPDate();
         $shift_date = date("d-m-Y",strtotime($p_date));
 
-        $total_shift_upi = Entry::where('date',$p_date)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
+        $total_shift_upi = Entry::where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
 
-        $total_shift_upi += DB::table('penalties')->where('date',$p_date)->where('added_by',Auth::id())->where('pay_type',2)->sum("penalty_amount");
+        $total_shift_upi += DB::table('penalties')->where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('pay_type',2)->sum("penalty_amount");
 
-        $total_shift_cash = Entry::where('date',$p_date)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
-        $total_shift_cash += DB::table('penalties')->where('date',$p_date)->where('added_by',Auth::id())->where('pay_type',1)->sum("penalty_amount");
+        $total_shift_cash = Entry::where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
+        $total_shift_cash += DB::table('penalties')->where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('pay_type',1)->sum("penalty_amount");
 
-        $last_hour_upi_total = Entry::where('date',$p_date)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',2)->whereBetween('check_in', [$from_time, $to_time])->sum("paid_amount"); 
-        $last_hour_upi_total += DB::table('penalties')->where('date',$p_date)->where('added_by',Auth::id())->where('pay_type',2)->whereBetween('current_time', [$from_time, $to_time])->sum("penalty_amount"); 
+        $last_hour_upi_total = Entry::where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',2)->whereBetween('check_in', [$from_time, $to_time])->sum("paid_amount"); 
+        $last_hour_upi_total += DB::table('penalties')->where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('pay_type',2)->whereBetween('current_time', [$from_time, $to_time])->sum("penalty_amount"); 
         
-        $last_hour_cash_total = Entry::where('date',$p_date)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',1)->whereBetween('check_in', [$from_time, $to_time])->sum("paid_amount");
-        $last_hour_cash_total += DB::table('penalties')->where('date',$p_date)->where('added_by',Auth::id())->where('pay_type',1)->whereBetween('current_time', [$from_time, $to_time])->sum("penalty_amount");
+        $last_hour_cash_total = Entry::where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',1)->whereBetween('check_in', [$from_time, $to_time])->sum("paid_amount");
+        $last_hour_cash_total += DB::table('penalties')->where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('pay_type',1)->whereBetween('current_time', [$from_time, $to_time])->sum("penalty_amount");
 
         $total_collection = $total_shift_upi + $total_shift_cash;
         $last_hour_total = $last_hour_upi_total + $last_hour_cash_total;

@@ -20,10 +20,18 @@
                     </div>
                     <ul class="nav nav-pills nav-stacked">
                         
-                        <li class="@if(isset($sidebar)) @if($sidebar == 'entries') active @endif @endif">
-                            <a href="{{url('/admin/locker')}}"><i class="fa fa-lock"></i>Entries</a>
+                        <li class="@if(isset($sidebar)) @if($sidebar == 'pods') active @endif @endif">
+                            <a href="{{url('/admin/entries/1')}}"><i class="fa fa-lock"></i>PODs</a>
                         </li>
-                        
+                        <li class="@if(isset($sidebar)) @if($sidebar == 'scabins') active @endif @endif">
+                            <a href="{{url('/admin/entries/2')}}"><i class="fa fa-lock"></i>Single Suit Cabin</a>
+                        </li>
+                        <li class="@if(isset($sidebar)) @if($sidebar == 'beds') active @endif @endif">
+                            <a href="{{url('/admin/entries/3')}}"><i class="fa fa-lock"></i>Double Beds</a>
+                        </li>
+                        <li class="@if(isset($sidebar)) @if($sidebar == 'shift') active @endif @endif">
+                            <a href="{{url('/admin/shift/current')}}"><i class="fa fa-lock"></i>Shift</a>
+                        </li>
                         @if(!Auth::user()->priv == 1)
                             <li class="@if(isset($sidebar)) @if($sidebar == 'users') active @endif @endif">
                                 <a href="{{url('/admin/users')}}"><i class="fa fa-users" aria-hidden="true"></i>Users</a>
