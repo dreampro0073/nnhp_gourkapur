@@ -35,82 +35,82 @@
                 <tbody>
                     <tr>
                        <td>
-                           Sitting
+                           PODS
                        </td> 
                        
                         <td>
-                            @{{shitting_data.last_hour_upi_total}}
+                            @{{pod_data.last_hour_upi_total}}
                         </td>
                         <td>
-                            @{{shitting_data.last_hour_cash_total}}
+                            @{{pod_data.last_hour_cash_total}}
 
                         </td>
                         <td>
-                            @{{shitting_data.last_hour_total}}
+                            @{{pod_data.last_hour_total}}
                         </td>
                         <td>
-                            @{{shitting_data.total_shift_upi}}
+                            @{{pod_data.total_shift_upi}}
                         </td>
                         <td>
-                            @{{shitting_data.total_shift_cash}}
+                            @{{pod_data.total_shift_cash}}
 
                         </td>
                         <td>
-                            @{{shitting_data.total_collection}}
-
-                        </td>
-                    </tr>
-                    <tr>
-                       <td>
-                           Massage
-                       </td> 
-                        <td>
-                            @{{massage_data.last_hour_upi_total}}
-                        </td>
-                        <td>
-                            @{{massage_data.last_hour_cash_total}}
-
-                        </td>
-                        <td>
-                            @{{massage_data.last_hour_total}}
-                        </td>
-
-                        <td>
-                            @{{massage_data.total_shift_upi}}
-                        </td>
-                        <td>
-                            @{{massage_data.total_shift_cash}}
-
-                        </td>
-                        <td>
-                            @{{massage_data.total_collection}}
+                            @{{pod_data.total_collection}}
 
                         </td>
                     </tr>
                     <tr>
                        <td>
-                           Locker
+                           Single Suit Cabin
                        </td> 
                         <td>
-                            @{{locker_data.last_hour_upi_total}}
+                            @{{cabin_data.last_hour_upi_total}}
                         </td>
                         <td>
-                            @{{locker_data.last_hour_cash_total}}
+                            @{{cabin_data.last_hour_cash_total}}
 
                         </td>
                         <td>
-                            @{{locker_data.last_hour_total}}
+                            @{{cabin_data.last_hour_total}}
                         </td>
 
                         <td>
-                            @{{locker_data.total_shift_upi}}
+                            @{{cabin_data.total_shift_upi}}
                         </td>
                         <td>
-                            @{{locker_data.total_shift_cash}}
+                            @{{cabin_data.total_shift_cash}}
 
                         </td>
                         <td>
-                            @{{locker_data.total_collection}}
+                            @{{cabin_data.total_collection}}
+
+                        </td>
+                    </tr>
+                    <tr>
+                       <td>
+                           Double Beds
+                       </td> 
+                        <td>
+                            @{{bed_data.last_hour_upi_total}}
+                        </td>
+                        <td>
+                            @{{bed_data.last_hour_cash_total}}
+
+                        </td>
+                        <td>
+                            @{{bed_data.last_hour_total}}
+                        </td>
+
+                        <td>
+                            @{{bed_data.total_shift_upi}}
+                        </td>
+                        <td>
+                            @{{bed_data.total_shift_cash}}
+
+                        </td>
+                        <td>
+                            @{{bed_data.total_collection}}
 
                         </td>
                     </tr>

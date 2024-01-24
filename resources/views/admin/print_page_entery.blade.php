@@ -52,7 +52,7 @@
 			M/s New Nabaratna Hospitality Pvt. Ltd.
 		</h4>
 		<p style="padding:0 15px;text-align: center;">
-			AC Executive Lounge, Haridwar Railway Station<br>PF No. 1
+			Gorakhpur Railway Station<br>PF No. 9
 		</p>
 		<h5>
 			GSTIN: 18AAICN4763E1ZA

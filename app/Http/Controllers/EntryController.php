@@ -56,7 +56,7 @@ class EntryController extends Controller {
 			$entries = $entries->where('deleted',0);
 		}
 		// $entries = $entries->where('type',$type)->where('checkout_status', 0);
-		$entries = $entries->where('type',$type);
+		$entries = $entries->where('checkout_status',0)->where('type',$type);
 		$entries = $entries->orderBy('id', "DESC")->get();
 
 
@@ -196,7 +196,6 @@ class EntryController extends Controller {
 				DB::table("double_beds")->whereIn('id',$sl_beds)->update(['status'=>1]);
 			}
 
-
 			
 			$entry->save();
 
@@ -221,10 +220,11 @@ class EntryController extends Controller {
 
     public function checkoutInit(Request $request){
 
-    	$now_time = strtotime(date("Y-m-d H:i:s",strtotime("+5 minutes")));
+    	$now_time = strtotime(date("Y-m-d H:i:s",strtotime("+10 minutes")));
 
     	$l_entry = Entry::where('id', $request->entry_id)->first();
-    	$checkout_time = strtotime($l_entry->checkout_date);
+
+    	$checkout_time = strtotime($l_entry->check_out);
 
     	if($checkout_time > $now_time){
     		$data['timeOut'] = false;
@@ -234,73 +234,29 @@ class EntryController extends Controller {
     		$entry->save();
     		$data['success'] = true;
 
-			$locker_ids = explode(',', $l_entry->locker_ids);
+			$e_ids = explode(',', $l_entry->e_ids);
 
+			Entry::updateAvailStatus($l_entry->type,$e_ids);
 
-    		DB::table('lockers')->whereIn('id',$locker_ids)->update(['status'=>0]);
+			// dd($e_ids);
     
     	} else {
-    		$str_day = ($now_time - $checkout_time)/(60 * 60 * 24);
-    		$day =0;
-    		if($str_day > 0 && $str_day <= 1){
-    			$day = 1;
-    		}else if($str_day > 1 && $str_day <= 2){
-    			$day = 2;
-    		}if($str_day > 2 && $str_day <= 3){
-    			$day = 3;
-    		}if($str_day > 3 && $str_day <= 4){
-    			$day = 4;
-    		}if($str_day > 4 && $str_day <= 5){
-    			$day = 5;
-    		}if($str_day > 5 && $str_day <= 6){
-    			$day = 6;
-    		}if($str_day > 6 && $str_day <= 7){
-    			$day = 7;
-    		}if($str_day > 7 && $str_day <= 8){
-    			$day = 8;
-    		}if($str_day > 8 && $str_day <= 9){
-    			$day = 9;
-    		}if($str_day > 9 && $str_day <= 10){
-    			$day = 10;
-    		}if($str_day > 10 && $str_day <= 11){
-    			$day = 11;
-    		}if($str_day > 11 && $str_day <= 12){
-    			$day = 12;
-    		}if($str_day > 12 && $str_day <= 13){
-    			$day = 13;
-    		}if($str_day > 13 && $str_day <= 14){
-    			$day = 14;
-    		}if($str_day > 14 && $str_day <= 15){
-    			$day = 15;
-    		}if($str_day > 15 && $str_day <= 16){
-    			$day = 16;
-    		}if($str_day > 16 && $str_day <= 17){
-    			$day = 17;
-    		}if($str_day > 17 && $str_day <= 18){
-    			$day = 18;
-    		}if($str_day > 18 && $str_day <= 19){
-    			$day = 19;
-    		}if($str_day > 19 && $str_day <= 20){
-    			$day = 20;
-    		}if($str_day > 20 && $str_day <= 21){
-    			$day = 21;
-    		}if($str_day > 21 && $str_day <= 22){
-    			$day = 22;
-    		}if($str_day > 22 && $str_day <= 23){
-    			$day = 23;
-    		}
-
-    		$locker_ids = explode(',', $request->locker_ids);
+    		$hour = round(($now_time - $checkout_time)/(60 * 60));
+    		$e_ids = explode(',', $l_entry->e_ids);
 
 			$l_entry->mobile_no = $l_entry->mobile_no*1;
-			$l_entry->train_no = $l_entry->train_no*1;
 			$l_entry->pnr_uid = $l_entry->pnr_uid*1;
 			$l_entry->paid_amount = $l_entry->paid_amount*1;
-			$l_entry->balance = $day*70*sizeof($locker_ids);
-			$l_entry->total_balance = $l_entry->paid_amount+$l_entry->balance;
-			$l_entry->day = $day;
 
-			
+			$l_entry->check_in = date("H:i A",strtotime($l_entry->check_in));
+			$l_entry->check_out = date("H:i A",strtotime($l_entry->check_out));
+
+
+			$balance = Entry::getAmount($l_entry->type,$hour,sizeof($e_ids));
+
+			$l_entry->balance = $balance;
+			$l_entry->total_balance = $l_entry->paid_amount+$l_entry->balance;
+			$l_entry->hour = $hour;
 			$data['l_entry'] = $l_entry;
 			$data['success'] = true;
 			$data['timeOut'] = true;
@@ -324,21 +280,22 @@ class EntryController extends Controller {
 
 
 		DB::table('penalties')->insert([
-			'locker_entry_id' => $entry->id,
+			'entry_id' => $entry->id,
 			'penalty_amount' => $request->balance,
 			'pay_type' => $request->pay_type,
+			'type' => $entry->type,
 			'shift' => $check_shift,
 			'date' =>$date,
 			'added_by' =>Auth::id(),
-			'user_session_id' => Auth::users()->session_id,
+			'user_session_id' => Auth::user()->session_id,
 			'current_time' => date("H:i:s"),
 			'created_at' => date('Y-m-d H:i:s'),
 		]);
 
-		$locker_ids = explode(',', $request->locker_ids);
-
-		DB::table('lockers')->whereIn('id',$locker_ids)->update(['status'=>0]);
+		$e_ids = explode(',', $request->e_ids);
+		Entry::updateAvailStatus($entry->type,$e_ids);
 		$data['success'] = true;
+		
 		return Response::json($data, 200, []);
     }
     

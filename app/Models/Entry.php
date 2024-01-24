@@ -31,6 +31,18 @@ class Entry extends Model
         return DB::table('double_beds')->where('status',0)->get();
     }
 
+    public static function getAvailPodsAr(){
+        return DB::table('pods')->where('status',0)->pluck('id')->toArray();
+    }
+
+    public static function getAvailSinCabinsAr(){
+        return DB::table('single_cabins')->where('status',0)->pluck('id')->toArray();
+    }
+
+    public static function getAvailBedsAr(){
+        return DB::table('double_beds')->where('status',0)->pluck('id')->toArray();
+    }
+
     public static function showPayTypes(){
         return [1=>'Cash',2=>"UPI"];
     }
@@ -83,7 +95,7 @@ class Entry extends Model
 
     }
 
-    public static function totalShiftData(){
+    public static function totalShiftData($type = 1){
         $check_shift = Entry::checkShift();
         
         $total_shift_cash = 0;
@@ -98,18 +110,18 @@ class Entry extends Model
         $p_date = Entry::getPDate();
         $shift_date = date("d-m-Y",strtotime($p_date));
 
-        $total_shift_upi = Entry::where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
+        $total_shift_upi = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
 
-        $total_shift_upi += DB::table('penalties')->where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('pay_type',2)->sum("penalty_amount");
+        $total_shift_upi += DB::table('penalties')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',2)->sum("penalty_amount");
 
-        $total_shift_cash = Entry::where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
-        $total_shift_cash += DB::table('penalties')->where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('pay_type',1)->sum("penalty_amount");
+        $total_shift_cash = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
+        $total_shift_cash += DB::table('penalties')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',1)->sum("penalty_amount");
 
-        $last_hour_upi_total = Entry::where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',2)->whereBetween('check_in', [$from_time, $to_time])->sum("paid_amount"); 
-        $last_hour_upi_total += DB::table('penalties')->where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('pay_type',2)->whereBetween('current_time', [$from_time, $to_time])->sum("penalty_amount"); 
+        $last_hour_upi_total = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
+        $last_hour_upi_total += DB::table('penalties')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("penalty_amount"); 
         
-        $last_hour_cash_total = Entry::where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('deleted',0)->where('pay_type',1)->whereBetween('check_in', [$from_time, $to_time])->sum("paid_amount");
-        $last_hour_cash_total += DB::table('penalties')->where('user_session_id',Auth::user()->session_id)->where('added_by',Auth::id())->where('pay_type',1)->whereBetween('current_time', [$from_time, $to_time])->sum("penalty_amount");
+        $last_hour_cash_total = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
+        $last_hour_cash_total += DB::table('penalties')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("penalty_amount");
 
         $total_collection = $total_shift_upi + $total_shift_cash;
         $last_hour_total = $last_hour_upi_total + $last_hour_cash_total;
@@ -127,8 +139,69 @@ class Entry extends Model
         return $data;
     }
 
-    public function getPDate(){
+    public static function getPDate(){
         $p_date = date("Y-m-d");
         return $p_date;
     }
+
+    public static function updateAvailStatus($type,$ids){
+        if($type == 1){
+            DB::table('pods')->whereIn('id',$ids)->update([
+                'status' => 0,
+            ]);
+        }
+        if($type == 2){
+            DB::table('single_cabins')->whereIn('id',$ids)->update([
+                'status' => 0,
+            ]);
+        }
+        if($type == 3){
+            DB::table('double_beds')->whereIn('id',$ids)->update([
+                'status' => 0,
+            ]);
+        }
+        return 'done';
+       
+    }
+
+    public static function getAmount($type,$hour,$size){
+        $balance= 0;
+        if($type == 1){
+            if($hour > 1 && $hour <= 6){
+                $balance = 299*$size;
+            }else if($hour > 6 && $hour <= 12){
+                $balance = 499*$size;
+
+            }else if($hour > 12 && $hour <= 24){
+                $balance = 799*$size;   
+            }
+            // dd($balance);
+            
+        }
+        if($type == 2){
+            if($hour > 1 && $hour <= 6){
+                $balance = 399*$size;
+            }else if($hour > 6 && $hour <= 12){
+                $balance = 599*$size;
+
+            }else if($hour > 12 && $hour <= 24){
+                $balance = 1199*$size;   
+            }
+
+        }
+        if($type == 3){
+            if($hour > 1 && $hour <= 6){
+                $balance = 599*$size;
+            }else if($hour > 6 && $hour <= 12){
+                $balance = 899*$size;
+
+            }else if($hour > 12 && $hour <= 24){
+                $balance = 1699*$size;   
+            }
+        }
+        return $balance;
+       
+    }
+
+
 }

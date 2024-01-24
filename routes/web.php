@@ -48,6 +48,10 @@ Route::group(['middleware'=>'auth'],function(){
 			
 		});
 
+		Route::group(['prefix'=>"users"], function(){
+			Route::get('/',[UserController::class,'users']);
+		});
+
 	});
 });
 
@@ -67,5 +71,11 @@ Route::group(['prefix'=>"api"], function(){
 		Route::post('/init',[ShiftController::class,'init']);
 		Route::post('/prev-init',[ShiftController::class,'prevInit']);
 
+	});
+
+	Route::group(['prefix'=>"users"], function(){
+		Route::post('/init',[UserController::class,'initUsers']);
+		Route::post('/edit-init',[UserController::class,'editUser']);
+		Route::post('/store',[UserController::class,'storeUser']);
 	});
 });

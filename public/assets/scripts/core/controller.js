@@ -56,13 +56,13 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
 
     $scope.checkoutLoker = function(entry_id){
         $scope.entry_id = entry_id;
-
+        
         if(confirm("Are you sure?") == true){
-             DBService.postCall({entry_id : $scope.entry_id}, '/api/entries/checkout-init').then((data) => {
+            DBService.postCall({entry_id : $scope.entry_id}, '/api/entries/checkout-init').then((data) => {
                 if (data.timeOut) {
                     $scope.formData = data.l_entry;
                     
-                    $("#checkoutLokerModel").modal("show");
+                    $("#checkoutModal").modal("show");
                 }else{
                     $scope.init(); 
                 }
@@ -79,7 +79,7 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
 
     $scope.hideModal = () => {
         $("#exampleModalCenter").modal("hide");
-        $("#checkoutLokerModel").modal("hide");
+        $("#checkoutModal").modal("hide");
         $scope.entry_id = 0;
         $scope.formData = {
             name:'',
@@ -150,7 +150,7 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
         $scope.loading = true;
         DBService.postCall($scope.formData, '/api/entries/checkout-store').then((data) => {
             if (data.success) {
-                $("#checkoutLokerModel").modal("hide");
+                $("#checkoutModal").modal("hide");
                 $scope.entry_id = 0;
                 $scope.formData = {
                     name:'',
@@ -255,10 +255,11 @@ app.controller('shiftCtrl', function($scope , $http, $timeout , DBService) {
 
         DBService.postCall($scope.filter, '/api/shift/init').then((data) => {
             if (data.success) {                 
-                $scope.shitting_data = data.shitting_data ; 
-                $scope.massage_data = data.massage_data ; 
-                $scope.locker_data = data.locker_data ; 
+                $scope.pod_data = data.pod_data ; 
+                $scope.cabin_data = data.cabin_data ; 
+                $scope.bed_data = data.bed_data ; 
 
+                
                 $scope.total_shift_upi = data.total_shift_upi ; 
                 $scope.total_shift_cash = data.total_shift_cash ; 
                 $scope.total_collection = data.total_collection ; 
@@ -274,25 +275,7 @@ app.controller('shiftCtrl', function($scope , $http, $timeout , DBService) {
         });
     }    
 
-    $scope.prevInit = function () {
-        $scope.loading = false;
-
-        DBService.postCall($scope.filter, '/api/shift/prev-init').then((data) => {
-            if (data.success) {                 
-                $scope.shitting_data = data.shitting_data ; 
-                $scope.massage_data = data.massage_data ; 
-                $scope.locker_data = data.locker_data ; 
-
-                $scope.total_shift_upi = data.total_shift_upi ; 
-                $scope.total_shift_cash = data.total_shift_cash ; 
-                $scope.total_collection = data.total_collection ; 
-                
-                $scope.check_shift = data.check_shift ; 
-                $scope.shift_date = data.shift_date ; 
-            }
-            $scope.loading = true;
-        });
-    }
+   
     
 });
 

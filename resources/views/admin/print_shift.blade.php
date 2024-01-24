@@ -52,7 +52,7 @@
 			M/s New Nabaratna Hospitality Pvt. Ltd.
 		</h4>
 		<p style="padding:0 15px;text-align: center;">
-			AC Executive Lounge, Haridwar Railway Station<br>PF No. 1
+			Gorakhpur Railway Station<br>PF No. 9
 		</p>
 		<h5>
 			GSTIN: 18AAICN4763E1ZA
@@ -73,51 +73,51 @@
               
               	 <tr>
                    <td>
-                       <b>Sitting</b>
+                       <b>PODs</b>
                    </td> 
                    
                     <td>
-                        {{$shitting_data['total_shift_upi']}}
+                        {{$pod_data['total_shift_upi']}}
                     </td>
                     <td>
-                        {{$shitting_data['total_shift_cash']}}
+                        {{$pod_data['total_shift_cash']}}
                     </td>
                     <td>
-                        {{$shitting_data['total_collection']}}
+                        {{$pod_data['total_collection']}}
                     </td>
                   
                    
                 </tr>
                 <tr>
                    <td>
-                       <b>Massage </b>
+                       <b>Single Suit Cabin </b>
                    </td> 
                    
                     <td>
-                        {{$massage_data['total_shift_upi']}}
+                        {{$cabin_data['total_shift_upi']}}
                     </td>
                     <td>
-                        {{$massage_data['total_shift_cash']}}
+                        {{$cabin_data['total_shift_cash']}}
                     </td>
                     <td>
-                        {{$massage_data['total_collection']}}
+                        {{$cabin_data['total_collection']}}
                     </td>
                   
                    
                 </tr>
                  <tr>
                    <td>
-                       <b>Locker </b>
+                       <b>Double Beds </b>
                    </td> 
                    
                     <td>
-                        {{$locker_data['total_shift_upi']}}
+                        {{$bed_data['total_shift_upi']}}
                     </td>
                     <td>
-                        {{$locker_data['total_shift_cash']}}
+                        {{$bed_data['total_shift_cash']}}
                     </td>
                     <td>
-                        {{$locker_data['total_collection']}}
+                        {{$bed_data['total_collection']}}
                     </td>
                   
                    
@@ -145,7 +145,7 @@
         </table>  
 
         <h5 style="margin-top:16px;">
-			{{Auth::user()->name}} -  {{$shitting_data['shift_date']}}
+			{{Auth::user()->name}} -  {{$pod_data['shift_date']}}
 		</h5>
 		
 		

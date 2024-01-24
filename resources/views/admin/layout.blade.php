@@ -16,9 +16,13 @@
                 <div class="ul" style="width:250px;background-color: #ececec59;position: fixed;top: 0;left: 0;height: 100vh;overflow-y: scroll;padding:0;">
                     <div style="padding:16px;">
                         <span style="font-size: 18px;font-weight: bold">M/s New Nabaratna Hospitality Pvt. Ltd.</span> 
-                        <div style="font-size: 12px; padding-top: 5px;">Haridwar Railway Station | GSTIN : 18AAICN4763E1ZA</div>
+                        <div style="font-size: 12px; padding-top: 5px;">Gorakhpur Railway Station | GSTIN : 18AAICN4763E1ZA</div>
                     </div>
                     <ul class="nav nav-pills nav-stacked">
+
+                        <li class="@if(isset($sidebar)) @if($sidebar == 'dashboard') active @endif @endif">
+                            <a href="{{url('/admin/dashboard')}}"><i class="fa fa-lock"></i>Dashboard</a>
+                        </li>
                         
                         <li class="@if(isset($sidebar)) @if($sidebar == 'pods') active @endif @endif">
                             <a href="{{url('/admin/entries/1')}}"><i class="fa fa-lock"></i>PODs</a>
@@ -32,7 +36,7 @@
                         <li class="@if(isset($sidebar)) @if($sidebar == 'shift') active @endif @endif">
                             <a href="{{url('/admin/shift/current')}}"><i class="fa fa-lock"></i>Shift</a>
                         </li>
-                        @if(!Auth::user()->priv == 1)
+                        @if(Auth::user()->priv == 1)
                             <li class="@if(isset($sidebar)) @if($sidebar == 'users') active @endif @endif">
                                 <a href="{{url('/admin/users')}}"><i class="fa fa-users" aria-hidden="true"></i>Users</a>
                             </li>

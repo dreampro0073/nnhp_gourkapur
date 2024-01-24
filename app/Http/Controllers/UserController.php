@@ -71,7 +71,9 @@ class UserController extends Controller {
                     'session_id' => $session_id,
                 ]);
                 
-                return Redirect::to('/admin/entries');
+                // return Redirect::to('/admin/entries/1');
+
+                return Redirect::to('admin/dashboard');
 
 			} else {
                 return Redirect::back()->withInput()->with('failure','Invalid username or password');
