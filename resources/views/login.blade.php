@@ -1,10 +1,12 @@
- <!DOCTYPE html>
+<?php $version = env('JS_VERSION'); ?>
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>M/s New Nabaratna Hospitality Pvt. Ltd.</title>
     <link rel="stylesheet" type="text/css" href="{{url('bootstrap3/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{url('assets/css/custom.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url('assets/css/custom.css?v='.$version)}}">
 </head>
 <body>
 
@@ -80,7 +82,7 @@
     <script type="text/javascript" src="{{url('assets/scripts/jquery.validate.js')}}"></script>
     <script type="text/javascript" src="{{url('assets/scripts/jquery-ui.min.js')}}"></script>
     <script type="text/javascript" src="{{url('assets/scripts/bootstrap.min.js')}}"></script>
-    <script type="text/javascript" src="{{url('assets/js/custom.js')}}"></script>
+    <!-- <script type="text/javascript" src="{{url('assets/js/custom.js?v='.$version)}}"></script> -->
     <script type="text/javascript">
         $(".check-form").validate();
     </script>

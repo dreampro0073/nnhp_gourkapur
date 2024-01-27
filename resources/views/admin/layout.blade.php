@@ -1,3 +1,4 @@
+<?php $version = env('JS_VERSION'); ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="{{url('assets/font-awesome/css/font-awesome.min.css')}}">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/gijgo@1.9.14/css/gijgo.min.css">
     <link rel="stylesheet" type="text/css" href="{{url('date/bootstrap-time.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{url('assets/css/custom.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url('assets/css/custom.css?v='.$version)}}">
 </head>
 <body  ng-app="app">
 	<div id="wrapper">
@@ -111,8 +112,8 @@
     <script type="text/javascript" src="{{url('assets/js/custom.js')}}"></script>
     <script type="text/javascript" src="{{url('assets/scripts/core/app.js')}}" ></script>
     <script type="text/javascript" src="{{url('assets/scripts/core/services.js')}}" ></script>
-    <script type="text/javascript" type="text/javascript" src="{{url('assets/scripts/core/controller.js')}}"></script>
-    <script type="text/javascript" type="text/javascript" src="{{url('assets/scripts/core/user_ctrl.js')}}"></script>
+    <script type="text/javascript" type="text/javascript" src="{{url('assets/scripts/core/controller.js?v='.$version)}}"></script>
+    <script type="text/javascript" type="text/javascript" src="{{url('assets/scripts/core/user_ctrl.js?v='.$version)}}"></script>
     <script>
       angular.module("app").constant("CSRF_TOKEN", "{{ csrf_token() }}");
     </script>
