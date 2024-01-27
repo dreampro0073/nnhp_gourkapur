@@ -170,8 +170,21 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
 
 
 
-  
     $scope.changeAmount = () => {
+        if($scope.type == 1){
+            $scope.changeAmountPod();
+        }
+
+        if($scope.type == 2){
+            $scope.changeAmountCabin();
+        }
+
+        if($scope.type == 3){
+            $scope.changeAmountBed();
+        }
+    }
+  
+    $scope.changeAmountPod = () => {
         $scope.formData.total_amount = 0;
         if($scope.formData.hours_occ == 6){
            $scope.formData.total_amount= $scope.sl_pods.length*299;
@@ -223,7 +236,7 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
         }else{
             $scope.sl_pods.splice(idx,1);
         }
-        $scope.changeAmount();
+        $scope.changeAmountPod();
     }
 
     $scope.insCabins = (cabin_id) => {
@@ -250,6 +263,12 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
 app.controller('shiftCtrl', function($scope , $http, $timeout , DBService) {
     $scope.loading = false;
 
+    $scope.filter = {
+        input_date:'',
+    }
+    $scope.serach = function(){
+        $scope.init();
+    }
     $scope.init = function () {
         $scope.loading = false;
 

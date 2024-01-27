@@ -145,15 +145,21 @@ label.error {
   background-color: #337ab7;
   border-radius: 0; }
 
-.nav li a i {
-  margin-right: 8px;
-  width: 20px; }
+.nav li a {
+  color: #fff; }
+  .nav li a i {
+    margin-right: 8px;
+    width: 20px; }
+  .nav li a:hover {
+    color: #fff;
+    background-color: #337ab7;
+    border-radius: 0; }
 
 .box {
   background: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   padding: 20px;
-  min-height: 180px; }
+  min-height: 202px; }
   .box h4 {
     display: inline-block;
     width: 48px;
@@ -169,5 +175,11 @@ label.error {
     word-wrap: break-word;
     font-size: 16px;
     font-weight: bold; }
+
+.input-group-append {
+  position: absolute;
+  height: 42px; }
+  .input-group-append button {
+    height: 42px !important; }
 
 /*# sourceMappingURL=custom.css.map */

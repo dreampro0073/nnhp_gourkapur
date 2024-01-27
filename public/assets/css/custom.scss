@@ -179,9 +179,15 @@ label.error{
 .nav{
 	li{
 		a{
+			color: #fff;
 			i{
 				margin-right: 8px;
 				width: 20px;
+			}
+			&:hover{
+				color: #fff;
+				background-color: #337ab7;
+				border-radius: 0;
 			}
 		}		
 	}
@@ -190,7 +196,7 @@ label.error{
 	background: #fff;
 	box-shadow: 0 0 10px rgba(0,0,0,0.2);
 	padding: 20px;
-	min-height: 180px;
+	min-height: 202px;
 	h4{
 		display: inline-block;
 		width:48px;
@@ -208,4 +214,12 @@ label.error{
 		font-size: 16px;
 		font-weight: bold;
 	}
+}
+.input-group-append{
+	position:absolute;
+    height: 42px;
+    // background: red;
+    button{
+    	height:42px !important;
+    }
 }

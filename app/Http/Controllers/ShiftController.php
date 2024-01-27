@@ -32,12 +32,14 @@ class ShiftController extends Controller {
 		
 	}
 
-	public function init(){
+	public function init(Request $request){
+
+		$input_date = $request->input_date;
 
 		$current_shift = Entry::checkShift();
-		$pod_data = Entry::totalShiftData(1);
-		$cabin_data = Entry::totalShiftData(2);
-		$bed_data = Entry::totalShiftData(3);
+		$pod_data = Entry::totalShiftData(1,$input_date);
+		$cabin_data = Entry::totalShiftData(2,$input_date);
+		$bed_data = Entry::totalShiftData(3,$input_date);
 		
 		$data['pod_data'] = $pod_data;
 		$data['cabin_data'] = $cabin_data;
@@ -62,13 +64,7 @@ class ShiftController extends Controller {
 	public function print($type =1){
 		$current_shift = Entry::checkShift($type);
 
-		$current_shift = Entry::checkShift(2);
-
-
-
 		if($type == 1){
-
-
 			$pod_data = Entry::totalShiftData(1);
 			$cabin_data = Entry::totalShiftData(2);
 			$bed_data = Entry::totalShiftData(3);
@@ -77,8 +73,6 @@ class ShiftController extends Controller {
 			$cabin_data = Entry::totalShiftData(2);
 			$bed_data = Entry::totalShiftData(3);
 		}
-		
-	
 		
 		$total_shift_upi = $pod_data['total_shift_upi'] + $cabin_data['total_shift_upi'] + $bed_data['total_shift_upi'];
         $total_shift_cash = $pod_data['total_shift_cash'] + $cabin_data['total_shift_cash'] + $bed_data['total_shift_cash'];

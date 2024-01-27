@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<div style="height: 100vh;display: flex;align-content: center;justify-content:center;">
+<div style="height: 100vh;display: flex;align-content: center;justify-content:center;background: url('assets/img/indianrailway1.jpeg');no-repeat;background-size: cover;background-blend-mode: multiply;">
     <div class="container">
         <div class="row justify-content-center" >
 

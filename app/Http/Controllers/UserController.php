@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Redirect, Validator, Hash, Response, Session, DB,DateTime;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Crypt;
 
 use Dompdf\Dompdf;
@@ -20,10 +21,7 @@ use Dompdf\Options;
 class UserController extends Controller {
 
     public function index(){
-
-
         return Redirect::to('admin/dashboard');
-        
         return view('index');
     }
 
@@ -53,27 +51,58 @@ class UserController extends Controller {
 		$cre = ["email"=>$request->input("email"),"password"=>$request->input("password")];
 		$rules = ["email"=>"required","password"=>"required"];
 		$validator = Validator::make($cre,$rules);
-		
+
+        $flag = false;
+        $now_time = strtotime(date("H:i:s"));
+        // $now_time = strtotime("01:05:00");
+        $c_shift_start_time = strtotime("00:00:00");
+        $c_shift_end_time = strtotime("06:00:00");
+        if($now_time > $c_shift_start_time && $now_time < $c_shift_end_time){
+            $flag = true;
+        }else{
+            $flag = false;
+        }
+
+        $today = date("Y-m-d");
+        if($flag){
+            $today =  date("Y-m-d",strtotime("-1 day",strtotime($today)));
+        }
+
+        // dd($today);
+        // $startDate = Carbon::createFromFormat('H:i:s','22:00:00');
+        // $endDate = Carbon::createFromFormat('H:i:s','06:00:00');
+        // $check = Carbon::now()->between($startDate, $endDate, true);
+        // if($check){
+        //     dd('In Between');
+        // }else{
+        //     dd('In Not Between');
+        // }
+
+
         if($validator->passes()){
 
 			
             if(Auth::attempt($cre)){
-
-                $session_id = strtotime("now");
-
-                DB::table("user_sessions")->insert([
-                    'user_id' => Auth::id(),
-                    'session_id' => $session_id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                ]);
-
-                DB::table("users")->where('id',Auth::id())->update([
-                    'session_id' => $session_id,
-                ]);
                 
-                // return Redirect::to('/admin/entries/1');
 
-                return Redirect::to('admin/dashboard');
+                $check = DB::table('user_sessions')->where('user_id',Auth::id())->where('date',$today)->first();
+
+                if($check){
+                    return Redirect::to('admin/dashboard');
+
+                }else{
+                    $session_id = strtotime("now");
+                    $id = DB::table("user_sessions")->insertGetId([
+                        'user_id' => Auth::id(),
+                        'session_id' => $session_id,
+                        'date' => $today,
+                    ]);
+                    $ses = DB::table('user_sessions')->where('id',$id)->first();
+                    DB::table("users")->where('id',Auth::id())->update([
+                        'session_id' => $ses->session_id,
+                    ]);
+                    return Redirect::to('admin/dashboard');
+                }
 
 			} else {
                 return Redirect::back()->withInput()->with('failure','Invalid username or password');

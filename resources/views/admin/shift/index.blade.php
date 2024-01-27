@@ -1,3 +1,4 @@
+
 @extends('admin.layout')
 
 @section('main')
@@ -7,20 +8,39 @@
                 <div class="col-md-6">
                     <h2 class="">Total Shift Collection (@{{shift_date}} - @{{check_shift}})</h2>
                 </div>
+
+                @if(Auth::user()->priv != 1)
+
                 <div class="col-md-6 text-right" style="padding-top: 25px;">
                     <a href="{{url('/admin/shift/print/1')}}" class="btn btn-sm btn-warning"  target="_blank">
                         Print
                     </a>
                 </div>
+                @endif
             </div>
             <hr>
-             <table class="table table-bordered table-striped" style="width:100%;">
+            @if(Auth::user()->priv == 1)
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" class="datepicker form-control" ng-model="filter.input_date">
+                    
+                </div>
+                <div class="col-md-3">
+                    <button ng-click="serach()" class="btn btn-primary">
+                        Search
+                    </button>
+                </div>
+            </div>
+            <hr>
+            
+            @endif
+            
+            <table class="table table-bordered table-striped" style="width:100%;">
                 <thead>
                     <tr>
                         <th rowspan="2"></th>
                         <th colspan="3">Last Hour</th>
-                        <th colspan="3">Your Collection</th>
-
+                        <th colspan="3">Shift Collection</th>
                     </tr>
                     <tr>
                         <th>UPI</th>

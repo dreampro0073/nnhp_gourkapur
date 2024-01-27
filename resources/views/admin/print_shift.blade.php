@@ -145,7 +145,7 @@
         </table>  
 
         <h5 style="margin-top:16px;">
-			{{Auth::user()->name}} -  {{$pod_data['shift_date']}}
+			{{Auth::user()->name}} -  {{date("d-m-Y")}}
 		</h5>
 		
 		
