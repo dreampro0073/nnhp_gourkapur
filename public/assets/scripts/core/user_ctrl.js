@@ -61,6 +61,7 @@ app.controller('userCtrl', function($scope , $http, $timeout , DBService) {
         DBService.postCall($scope.formData, '/api/users/store').then((data) => {
             if (data.success) {
                 alert(data.message);
+                $scope.init();
                 $("#userModal").modal("hide");
                 $scope.formData = {
                     name:'',

@@ -225,7 +225,9 @@ class UserController extends Controller {
             $user->name = $request->name;
             $user->email = $request->email;
             $user->mobile = $request->mobile;    
-            $user->priv = 2;    
+            if(Auth::user()->priv !=1){
+                $user->priv = 2;    
+            }    
             
             $user->save();
             $data['success'] = true;

@@ -46,11 +46,10 @@
                             <th>Bill no</th>
                             <th>Name</th>
                             <th>Mobile No</th>
-                            <th>NOS</th>
                             <th>PNR</th>
-                           
-                            <th>Pay Type</th>
-                            <th>Total Amount</th>
+                            <th>Pay Type/Hr</th>
+                            <th>Paid Amount</th>
+                            <th>Discount Amount</th>
                             @if(Auth::user()->priv == 1)
                                 <th>#</th>
                             @endif
@@ -63,15 +62,17 @@
                             <td>@{{ item.unique_id }}</td>
                             <td>@{{ item.name }}</td>
                             <td>@{{ item.mobile_no }}</td>
-                            <td>@{{ item.nos }}</td>
+                            
                             <td>@{{ item.pnr_uid }}</td>
                             
                             <td>
                                 <span ng-if="item.pay_type == 1">Cash</span>
                                 <span ng-if="item.pay_type == 2">UPI</span>
+                                <span>/@{{item.hours_occ}}Hr</span>
                             </td>  
                             
-                            <td>@{{ item.paid_amount }}</td>
+                            <td>@{{ item.total_amount-item.discount_amount }}</td>
+                            <td>@{{item.discount_amount }}</td>
                             @if(Auth::user()->priv == 1)
                             <td>
                                 <div ng-if="item.deleted == 1">

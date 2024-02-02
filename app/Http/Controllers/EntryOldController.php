@@ -12,7 +12,7 @@ use Redirect, Validator, Hash, Response, Session, DB;
 use App\Models\Massage, App\Models\User;
 use App\Models\Entry;
 
-class EntryController extends Controller {	
+class EntryOldController extends Controller {	
 	public function index($type){
 		$sidebar = 'pods';
         $subsidebar = 'pods';
@@ -59,6 +59,7 @@ class EntryController extends Controller {
 		$entries = $entries->where('checkout_status',0)->where('type',$type);
 		$entries = $entries->orderBy('id', "DESC")->get();
 
+
 		$pay_types = Entry::payTypes();
 		$hours = Entry::hours();
 		$show_pay_types = Entry::showPayTypes();
@@ -80,8 +81,6 @@ class EntryController extends Controller {
 		$l_entry = Entry::where('id', $request->entry_id)->first();
 
 		$sl_pods = [];
-		$sl_cabins = [];
-		$sl_beds = [];
 
 		if($l_entry){
 			$l_entry->mobile_no = $l_entry->mobile_no*1;
@@ -93,29 +92,12 @@ class EntryController extends Controller {
 
 			$l_entry->check_in = date("h:i A",strtotime($l_entry->check_in));
 			$l_entry->check_out =date("h:i A",strtotime($l_entry->check_out));
-
-			$e_ids =  explode(',', $l_entry->e_ids);
-			
-			if($l_entry->type == 1){
-				$sl_pods = $e_ids;
-
-			}else if($l_entry->type == 2){
-				$sl_cabins = $e_ids;
-
-			}else{
-				$sl_beds = $e_ids;
-			}
-
-			$bm_amount = DB::table('e_entries')->where('entry_id','=',$l_entry->id)->sum('paid_amount');
-			$l_entry->paid_amount = $l_entry->paid_amount + $bm_amount;
-			$l_entry->bm_amount = $bm_amount;
+			$sl_pods = explode(',', $l_entry->e_ids);
 		}
 
 		$data['success'] = true;
 		$data['l_entry'] = $l_entry;
 		$data['sl_pods'] = $sl_pods;
-		$data['sl_cabins'] = $sl_cabins;
-		$data['sl_beds'] = $sl_beds;
 		return Response::json($data, 200, []);
 	}
 	public function calCheck(Request $request){
@@ -133,9 +115,6 @@ class EntryController extends Controller {
 	}
 
 	public function store(Request $request,$type){
-
-		$user_session_id = Auth::user()->session_id;
-		$user_id = Auth::id();
 
 		$check_shift = Entry::checkShift();
 
@@ -156,33 +135,44 @@ class EntryController extends Controller {
 				$entry = Entry::find($request->id);
 				$message = "Updated Successfully!";
 
-				
-				if($user_session_id != $entry->user_session_id){
-					DB::table('e_entries')->insert([
-						'entry_id' => $entry->id,
-						'added_by' => $user_id,
-						'user_session_id' => $user_session_id,
-						'date' => date("Y-m-d"),
-						'pay_type' => $request->pay_type,
-						'type' => $type,
-						'paid_amount' => $request->balance_amount,
-						'created_at' => date("Y-m-d H:i:s"),
-						'current_time' => date("H:i:s"),
-					]);
+				if(Auth::id() != $entry->added_by){
+
+					$entry->e_added_by = Auth::id();
+					$entry->e_user_session_id = Auth::user()->session_id;
+					$entry->e_paid_amount  = $balance_amount;
+
+
+					if($request->e_paid_amount !=0 ){
+						$entry->e_paid_amount  = $request->e_paid_amount;	
+					}
+
 				}else{
 					$paid_amount = $paid_amount + $balance_amount;
+
+					if($request->e_paid_amount){
+						$paid_amount = $request->paid_amount - $request->e_paid_amount;
+						
+					}
 					$entry->paid_amount = $paid_amount;
 				}
+				// if($entry){
+					// $old_entry = $entry;
+					// if(Auth::id() != $entry->added_by){
+						
+					// 	$entry = new Entry;
+					// 	$message = "Stored Successfully!";
+					// 	$entry->unique_id = strtotime('now');
+					// 	$entry->old_id = $old_entry->id;
+					// }
+				// }
 			} else {
 				$entry = new Entry;
 				$message = "Stored Successfully!";
 				$entry->unique_id = strtotime('now');
 				$entry->paid_amount = $paid_amount;
 
-				$entry->added_by = $user_id;
-				$entry->user_session_id = $user_session_id;
-				$entry->pay_type = $request->pay_type;
-
+				$entry->added_by = Auth::id();
+				$entry->user_session_id = Auth::user()->session_id;
 			}
 
 			$entry->name = $request->name;
@@ -201,6 +191,7 @@ class EntryController extends Controller {
 			$entry->total_amount = $total_amount;
 			$entry->discount_amount = $request->has('discount_amount')?$request->discount_amount:0;
 
+			$entry->pay_type = $request->pay_type;
 			$entry->remarks = $request->remarks;
 			$entry->shift = $check_shift;
 			$entry->type = $type;
@@ -262,7 +253,10 @@ class EntryController extends Controller {
 
     	$now_time = strtotime(date("Y-m-d H:i:s",strtotime("+10 minutes")));
     	$l_entry = Entry::where('id', $request->entry_id)->first();
+
     	$checkout_time = strtotime($l_entry->checkout_date);
+
+ 
 
     	if($checkout_time > $now_time){
     		$data['timeOut'] = false;
@@ -277,7 +271,11 @@ class EntryController extends Controller {
 			Entry::updateAvailStatus($l_entry->type,$e_ids);    
     	} else {
     		$hour = round(($now_time - $checkout_time)/(60 * 60));
+
+    		// dd($hour);
     		$e_ids = explode(',', $l_entry->e_ids);
+			// dd($l_entry);
+
 
 			$l_entry->mobile_no = $l_entry->mobile_no*1;
 			$l_entry->pnr_uid = $l_entry->pnr_uid;
@@ -314,9 +312,9 @@ class EntryController extends Controller {
 		$date = Entry::getPDate();
 
 
-		DB::table('e_entries')->insert([
+		DB::table('penalties')->insert([
 			'entry_id' => $entry->id,
-			'paid_amount' => $request->balance,
+			'penalty_amount' => $request->balance,
 			'pay_type' => $request->pay_type,
 			'type' => $entry->type,
 			'shift' => $check_shift,

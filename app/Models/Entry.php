@@ -120,29 +120,29 @@ class Entry extends Model
             $input_date = date("Y-m-d",strtotime($input_date));
             $total_shift_upi = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
 
-            $total_shift_upi += DB::table('penalties')->where('type',$type)->where('date',$input_date)->where('pay_type',2)->sum("penalty_amount");
+            $total_shift_upi += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',2)->sum("paid_amount");
 
             $total_shift_cash = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
-            $total_shift_cash += DB::table('penalties')->where('type',$type)->where('date',$input_date)->where('pay_type',1)->sum("penalty_amount");
+            $total_shift_cash += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',1)->sum("paid_amount");
 
             $last_hour_upi_total = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
-            $last_hour_upi_total += DB::table('penalties')->where('type',$type)->where('date',$input_date)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("penalty_amount"); 
+            $last_hour_upi_total += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
             
             $last_hour_cash_total = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
-            $last_hour_cash_total += DB::table('penalties')->where('type',$type)->where('date',$input_date)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("penalty_amount");
+            $last_hour_cash_total += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
         }else{
             $total_shift_upi = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
 
-            $total_shift_upi += DB::table('penalties')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',2)->sum("penalty_amount");
+            $total_shift_upi += DB::table('e_entries')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',2)->sum("paid_amount");
 
             $total_shift_cash = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
-            $total_shift_cash += DB::table('penalties')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',1)->sum("penalty_amount");
+            $total_shift_cash += DB::table('e_entries')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',1)->sum("paid_amount");
 
             $last_hour_upi_total = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
-            $last_hour_upi_total += DB::table('penalties')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("penalty_amount"); 
+            $last_hour_upi_total += DB::table('e_entries')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
             
             $last_hour_cash_total = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
-            $last_hour_cash_total += DB::table('penalties')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("penalty_amount");
+            $last_hour_cash_total += DB::table('e_entries')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
 
            
         }
@@ -193,7 +193,7 @@ class Entry extends Model
     public static function getAmount($type,$hour,$size){
         $balance= 0;
         if($type == 1){
-            if($hour > 1 && $hour <= 6){
+            if($hour > 0 && $hour <= 6){
                 $balance = 299*$size;
             }else if($hour > 6 && $hour <= 12){
                 $balance = 499*$size;
@@ -205,7 +205,7 @@ class Entry extends Model
             
         }
         if($type == 2){
-            if($hour > 1 && $hour <= 6){
+            if($hour > 0 && $hour <= 6){
                 $balance = 399*$size;
             }else if($hour > 6 && $hour <= 12){
                 $balance = 599*$size;
@@ -216,7 +216,7 @@ class Entry extends Model
 
         }
         if($type == 3){
-            if($hour > 1 && $hour <= 6){
+            if($hour > 0 && $hour <= 6){
                 $balance = 599*$size;
             }else if($hour > 6 && $hour <= 12){
                 $balance = 899*$size;

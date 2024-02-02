@@ -75,9 +75,11 @@
 				<span class="text">Bill No: <b>{{ $print_data->unique_id }}</b></span>
 			</div>
 			<div class="w-50">
-				<span class="text">Date: <b><?php echo date("d-m-Y"); ?></b></span>
+				<span class="text">PNR/ID No.: <b>{{$print_data->pnr_uid}}</b></span>
 			</div>
+			
 		</div>
+		
 		<div class="table-div">
 			<div class="w-50">
 				<span class="text">Name: <b>{{ $print_data->name }}</b></span>
@@ -97,21 +99,20 @@
 
 			
 		</div>
+		
 		<div class="table-div">
 			<div class="w-50">
-				<span class="text">PNR/ID No.: <b>{{$print_data->pnr_uid}}</b></span>
+				<span class="text">Paid Amount: <b>{{ $print_data->total_amount-$print_data->discount_amount }}Rs.</b></span>
 			</div>
 			<div class="w-50">
-				<span class="text">Paid Amount: <b>{{ $print_data->paid_amount }}</b></span>
+				<span class="text">Discount Amount: <b>{{ $print_data->discount_amount }}Rs.</b></span>
 			</div>
 		</div>
-		<div class="table-div">
-			<div class="w-50">
-				<span class="text">In Time: <b>{{date("h:i a",strtotime($print_data->check_in))}}</b></span>
-			</div>
-			<div class="w-50">
-				<span class="text">Out Time: <b>{{date("h:i a",strtotime($print_data->check_out))}}</b></span>
-			</div>
+		<div>
+			<span class="text">In Time: <b>{{date("h:i A",strtotime($print_data->check_in))}}, <?php echo date("d M Y"); ?></b></span>
+		</div>
+		<div>
+			<span class="text">Out Time: <b>{{date("h:i A, d M Y",strtotime($print_data->checkout_date))}}</b></span>
 		</div>
 		<div style="margin-top:10px;text-align: right;">
 			

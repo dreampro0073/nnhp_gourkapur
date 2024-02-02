@@ -48,8 +48,6 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
     $scope.edit = function(entry_id){
         $scope.entry_id = entry_id;
         $scope.sl_pods = [];
-        $scope.sl_cabins = [];
-        $scope.sl_beds = [];
         DBService.postCall({entry_id : $scope.entry_id}, '/api/entries/edit-init').then((data) => {
             if (data.success) {
                 console.log(data.l_entry.discount_amount+'hhhhh');
@@ -57,8 +55,6 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
                 $scope.total_amount = data.l_entry.total_amount;
 
                 $scope.sl_pods = data.sl_pods;
-                $scope.sl_cabins = data.sl_cabins;
-                $scope.sl_beds = data.sl_beds;
                 $("#exampleModalCenter").modal("show");
             }
             
@@ -85,18 +81,6 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
     $scope.add = function(){
         $scope.entry_id = 0;
         $scope.sl_pods = [];
-        $scope.sl_cabins = [];
-        $scope.sl_beds = [];
-        $scope.formData = {
-            name:'',
-            mobile:"",
-            paid_amount:0,
-            total_amount:0,
-            balance_amount:0,
-            hours_occ:'',
-            discount_amount:0,
-            
-        };
         $("#exampleModalCenter").modal("show");    
     }
 
@@ -107,16 +91,11 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
         $scope.formData = {
             name:'',
             mobile:"",
-            paid_amount:0,
             total_amount:0,
+            paid_amount:0,
             balance_amount:0,
-            hours_occ:'',
             discount_amount:0,
-            
         };
-        $scope.sl_pods = [];
-        $scope.sl_beds = [];
-        $scope.sl_cabins = [];
     }
 
     $scope.onSubmit = function () {
@@ -160,8 +139,6 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
                     name:'',
                     mobile:"",
                     paid_amount:0,
-                    total_amount:0,
-                    balance_amount:0,
                     hours_occ:'',
                     discount_amount:0,
                     
@@ -236,13 +213,17 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
                 $scope.formData.paid_amount = total_amount - $scope.formData.discount_amount;
             }else{
                 $scope.formData.paid_amount = total_amount;
+
             }
             $scope.formData.balance_amount = total_amount - $scope.formData.paid_amount;   
+
         }else{
             $scope.formData.balance_amount = total_amount - ($scope.formData.paid_amount + $scope.formData.discount_amount); 
 
+
+
         }
-        // $scope.balance_amount = $scope.formData.balance_amount; 
+        $scope.balance_amount = $scope.formData.balance_amount; 
     }
 
     $scope.changeAmountCabin = () => {
@@ -255,24 +236,16 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
         }else if($scope.formData.hours_occ == 24){
            total_amount = $scope.sl_cabins.length*1199;
         }
-
-        // console.log()
-
         $scope.total_amount = total_amount;
         $scope.formData.total_amount = total_amount;
 
-        if($scope.entry_id == 0){
-            if($scope.formData.discount_amount > 0){
-                $scope.formData.paid_amount = total_amount - $scope.formData.discount_amount;
-            }else{
-                $scope.formData.paid_amount = total_amount;
-            }
-            $scope.formData.balance_amount = total_amount - $scope.formData.paid_amount;   
+        if($scope.formData.discount_amount > 0){
+            $scope.formData.paid_amount = total_amount - $scope.formData.discount_amount;
         }else{
-            $scope.formData.balance_amount = total_amount - ($scope.formData.paid_amount + $scope.formData.discount_amount); 
+            $scope.formData.paid_amount = total_amount;
 
         }
-        // $scope.balance_amount = $scope.formData.balance_amount;  
+        $scope.formData.balance_amount = total_amount - $scope.formData.paid_amount;  
     }
 
     $scope.changeAmountBed = () => {
@@ -289,18 +262,12 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
         $scope.total_amount = total_amount;
         $scope.formData.total_amount = total_amount;
 
-        if($scope.entry_id == 0){
-            if($scope.formData.discount_amount > 0){
-                $scope.formData.paid_amount = total_amount - $scope.formData.discount_amount;
-            }else{
-                $scope.formData.paid_amount = total_amount;
-            }
-            $scope.formData.balance_amount = total_amount - $scope.formData.paid_amount;   
+        if($scope.formData.discount_amount > 0){
+            $scope.formData.paid_amount = total_amount - $scope.formData.discount_amount;
         }else{
-            $scope.formData.balance_amount = total_amount - ($scope.formData.paid_amount + $scope.formData.discount_amount); 
-
+            $scope.formData.paid_amount = total_amount;
         }
-        $scope.balance_amount = $scope.formData.balance_amount; 
+        $scope.formData.balance_amount = total_amount - $scope.formData.paid_amount;   
     }
 
     $scope.delete = function (id) {
