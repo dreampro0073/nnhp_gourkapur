@@ -18,7 +18,7 @@ use Crypt;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-class UserController extends Controller {
+class UserControllerOld extends Controller {
 
     public function index(){
         return Redirect::to('admin/dashboard');
@@ -51,13 +51,45 @@ class UserController extends Controller {
 		$cre = ["email"=>$request->input("email"),"password"=>$request->input("password")];
 		$rules = ["email"=>"required","password"=>"required"];
 		$validator = Validator::make($cre,$rules);
+
+        $flag = false;
+        $now_time = strtotime(date("H:i:s"));
+        // $now_time = strtotime("01:05:00");
+        $c_shift_start_time = strtotime("00:00:00");
+        $c_shift_end_time = strtotime("06:00:00");
+        if($now_time > $c_shift_start_time && $now_time < $c_shift_end_time){
+            $flag = true;
+        }else{
+            $flag = false;
+        }
+
         $today = date("Y-m-d");
+        if($flag){
+            $today =  date("Y-m-d",strtotime("-1 day",strtotime($today)));
+        }
+
+        // dd($today);
+        // $startDate = Carbon::createFromFormat('H:i:s','22:00:00');
+        // $endDate = Carbon::createFromFormat('H:i:s','06:00:00');
+        // $check = Carbon::now()->between($startDate, $endDate, true);
+        // if($check){
+        //     dd('In Between');
+        // }else{
+        //     dd('In Not Between');
+        // }
+
+
         if($validator->passes()){
+
+			
             if(Auth::attempt($cre)){
+                
+
                 $check = DB::table('user_sessions')->where('user_id',Auth::id())->where('date',$today)->first();
 
                 if($check){
                     return Redirect::to('admin/dashboard');
+
                 }else{
                     $session_id = strtotime("now");
                     $id = DB::table("user_sessions")->insertGetId([

@@ -7,7 +7,10 @@
 		@page { margin: 0; }
 		body { margin: 0; }
 		.main{
-			width: 300px;
+			width: 790px;
+			height: 1100px;
+			padding: 100px;
+			padding-top: 100px;
 		}
 		h4{
 			
@@ -109,7 +112,7 @@
 			</div>
 		</div>
 		<div>
-			<span class="text">In Time: <b>{{date("h:i A",strtotime($print_data->check_in))}}, <?php echo date("d M Y"); ?></b></span>
+			<span class="text">In Time: <b>{{date("h:i A, , d M Y",strtotime($print_data->created_at))}}</b></span>
 		</div>
 		<div>
 			<span class="text">Out Time: <b>{{date("h:i A, d M Y",strtotime($print_data->checkout_date))}}</b></span>

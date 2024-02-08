@@ -43,6 +43,18 @@ class Entry extends Model
         return DB::table('double_beds')->where('status',0)->pluck('id')->toArray();
     }
 
+    public static function getBookedPodsAr(){
+        return DB::table('pods')->where('status',1)->pluck('id')->toArray();
+    }
+
+    public static function getBookedSinCabinsAr(){
+        return DB::table('single_cabins')->where('status',1)->pluck('id')->toArray();
+    }
+
+    public static function getBookedBedsAr(){
+        return DB::table('double_beds')->where('status',1)->pluck('id')->toArray();
+    }
+
     public static function showPayTypes(){
         return [1=>'Cash',2=>"UPI"];
     }
@@ -95,7 +107,7 @@ class Entry extends Model
 
     }
 
-    public static function totalShiftData($type = 1,$input_date= ""){
+    public static function totalShiftData($type = 1,$input_date= "",$user_id=0){
         $check_shift = Entry::checkShift();
         
         $total_shift_cash = 0;
@@ -103,6 +115,9 @@ class Entry extends Model
 
         $last_hour_cash_total = 0;
         $last_hour_upi_total = 0;
+
+        $total_collection = 0;
+        $last_hour_total =0;
 
         $from_time = date('H:00:00');
         $to_time = date('H:59:59');
@@ -118,49 +133,88 @@ class Entry extends Model
 
             // dd($input_date);
             $input_date = date("Y-m-d",strtotime($input_date));
-            $total_shift_upi = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
 
-            $total_shift_upi += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',2)->sum("paid_amount");
+            if($user_id == 0){
+                $total_shift_upi = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
 
-            $total_shift_cash = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
-            $total_shift_cash += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',1)->sum("paid_amount");
+                $total_shift_upi += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',2)->sum("paid_amount");
 
-            $last_hour_upi_total = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
-            $last_hour_upi_total += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
+                $total_shift_cash = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
+                $total_shift_cash += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',1)->sum("paid_amount");
+
+                $last_hour_upi_total = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',2)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount"); 
+                $last_hour_upi_total += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',2)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount"); 
+                
+                $last_hour_cash_total = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',1)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount");
+                $last_hour_cash_total += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',1)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount");
+            }else{
+                $total_shift_upi = Entry::where('type',$type)->where('date',$input_date)->where('added_by',$user_id)->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
+
+                $total_shift_upi += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('added_by',$user_id)->where('pay_type',2)->sum("paid_amount");
+
+                $total_shift_cash = Entry::where('type',$type)->where('date',$input_date)->where('added_by',$user_id)->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
+                $total_shift_cash += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('added_by',$user_id)->where('pay_type',1)->sum("paid_amount");
+
+                $last_hour_upi_total = Entry::where('type',$type)->where('date',$input_date)->where('added_by',$user_id)->where('deleted',0)->where('pay_type',2)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount"); 
+                $last_hour_upi_total += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('added_by',$user_id)->where('pay_type',2)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount"); 
+                
+                $last_hour_cash_total = Entry::where('type',$type)->where('date',$input_date)->where('added_by',$user_id)->where('deleted',0)->where('pay_type',1)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount");
+                $last_hour_cash_total += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('added_by',$user_id)->where('pay_type',1)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount");
+            }
+
             
-            $last_hour_cash_total = Entry::where('type',$type)->where('date',$input_date)->where('deleted',0)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
-            $last_hour_cash_total += DB::table('e_entries')->where('type',$type)->where('date',$input_date)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
+
+
+
+
+
+
+            $total_collection = $total_shift_upi + $total_shift_cash;
+            $last_hour_total = $last_hour_upi_total + $last_hour_cash_total;
+
+
+            $data['total_shift_upi'] = $total_shift_upi;
+            $data['total_shift_cash'] = $total_shift_cash;
+            $data['total_collection'] = $total_collection;
+
+            $data['last_hour_upi_total'] = $last_hour_upi_total;
+            $data['last_hour_cash_total'] = $last_hour_cash_total;
+            $data['last_hour_total'] = $last_hour_total;
+            $data['check_shift'] = $check_shift;
+            $data['shift_date'] = $shift_date;
         }else{
-            $total_shift_upi = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',2)->sum("paid_amount");
+            $total_shift_upi = Entry::where('type',$type)->where('added_by',Auth::id())->where('deleted',0)->where('date',$p_date)->where('pay_type',2)->sum("paid_amount");
 
-            $total_shift_upi += DB::table('e_entries')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',2)->sum("paid_amount");
 
-            $total_shift_cash = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
-            $total_shift_cash += DB::table('e_entries')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',1)->sum("paid_amount");
+            $total_shift_upi += DB::table('e_entries')->where('type',$type)->where('added_by',Auth::id())->where('date',$p_date)->where('pay_type',2)->sum("paid_amount");
 
-            $last_hour_upi_total = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
-            $last_hour_upi_total += DB::table('e_entries')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',2)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount"); 
+            $total_shift_cash = Entry::where('type',$type)->where('added_by',Auth::id())->where('deleted',0)->where('date',$p_date)->where('deleted',0)->where('pay_type',1)->sum("paid_amount");
+            $total_shift_cash += DB::table('e_entries')->where('type',$type)->where('added_by',Auth::id())->where('date',$p_date)->where('pay_type',1)->sum("paid_amount");
+
+            $last_hour_upi_total = Entry::where('type',$type)->where('added_by',Auth::id())->where('deleted',0)->where('date',$p_date)->where('pay_type',2)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount");
+
+            $last_hour_upi_total += DB::table('e_entries')->where('type',$type)->where('added_by',Auth::id())->where('date',$p_date)->where('pay_type',2)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount"); 
             
-            $last_hour_cash_total = Entry::where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('deleted',0)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
-            $last_hour_cash_total += DB::table('e_entries')->where('type',$type)->where('user_session_id',Auth::user()->session_id)->where('pay_type',1)->where('created_at', '>=', \DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'))->sum("paid_amount");
+            $last_hour_cash_total = Entry::where('type',$type)->where('added_by',Auth::id())->where('deleted',0)->where('date',$p_date)->where('pay_type',1)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount");
+            $last_hour_cash_total += DB::table('e_entries')->where('type',$type)->where('added_by',Auth::id())->where('date',$p_date)->where('pay_type',1)->whereBetween('created_at', [date('Y-m-d H:00:00'), date("Y-m-d H:i:s")])->sum("paid_amount");
 
+            $total_collection = $total_shift_upi + $total_shift_cash;
+            $last_hour_total = $last_hour_upi_total + $last_hour_cash_total;
+
+
+            $data['total_shift_upi'] = $total_shift_upi;
+            $data['total_shift_cash'] = $total_shift_cash;
+            $data['total_collection'] = $total_collection;
+
+            $data['last_hour_upi_total'] = $last_hour_upi_total;
+            $data['last_hour_cash_total'] = $last_hour_cash_total;
+            $data['last_hour_total'] = $last_hour_total;
+            $data['check_shift'] = $check_shift;
+            $data['shift_date'] = $shift_date;
            
         }
 
-        $total_collection = $total_shift_upi + $total_shift_cash;
-        $last_hour_total = $last_hour_upi_total + $last_hour_cash_total;
-
-        // dd($total_shift_upi);
-
-        $data['total_shift_upi'] = $total_shift_upi;
-        $data['total_shift_cash'] = $total_shift_cash;
-        $data['total_collection'] = $total_collection;
-
-        $data['last_hour_upi_total'] = $last_hour_upi_total;
-        $data['last_hour_cash_total'] = $last_hour_cash_total;
-        $data['last_hour_total'] = $last_hour_total;
-        $data['check_shift'] = $check_shift;
-        $data['shift_date'] = $shift_date;
+        
 
         return $data;
     }
@@ -228,6 +282,4 @@ class Entry extends Model
         return $balance;
        
     }
-
-
 }

@@ -22,6 +22,10 @@ class AdminController extends Controller {
 		$avail_pods = Entry::getAvailPodsAr();
 		$avail_cabins = Entry::getAvailSinCabinsAr();
 		$avail_beds = Entry::getAvailBedsAr();
+
+		$booked_pods = Entry::getBookedPodsAr();
+		$booked_cabins = Entry::getBookedSinCabinsAr();
+		$booked_beds = Entry::getBookedBedsAr();
 		    
 		return view('admin.dashboard', [
             "sidebar" => "dashboard",
@@ -29,6 +33,9 @@ class AdminController extends Controller {
             "avail_pods" => $avail_pods,
             "avail_cabins" => $avail_cabins,
             "avail_beds" => $avail_beds,
+            "booked_pods" => $booked_pods,
+            "booked_cabins" => $booked_cabins,
+            "booked_beds" => $booked_beds,
         ]);
 	}	
 

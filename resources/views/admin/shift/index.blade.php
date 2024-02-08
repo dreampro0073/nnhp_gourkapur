@@ -21,13 +21,23 @@
             <hr>
             @if(Auth::user()->priv == 1)
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-3 form-group">
                     <input type="text" class="datepicker form-control" ng-model="filter.input_date">
+                    
+                </div>
+                <div class="col-md-3 form-group" >
+                    <select ng-model="filter.user_id" class="form-control" convert-to-number>
+                        <option value="">Select</option>
+                        <option value="@{{user.id}}" ng-repeat="user in users">@{{user.name}}</option>
+                    </select>
                     
                 </div>
                 <div class="col-md-3">
                     <button ng-click="serach()" class="btn btn-primary">
                         Search
+                    </button>
+                    <button ng-click="clear()" class="btn btn-warning">
+                        Clear
                     </button>
                 </div>
             </div>
@@ -149,10 +159,10 @@
                             <b>@{{last_hour_total}}</b>
                         </td>
                         <td>
-                            <b>@{{total_shift_upi}}</b>
+                            <b>@{{pod_data.total_shift_upi+cabin_data.total_shift_upi+bed_data.total_shift_upi}}</b>
                         </td>
                         <td>
-                            <b>@{{total_shift_cash}}</b>
+                            <b> <b>@{{pod_data.total_shift_cash+cabin_data.total_shift_cash+bed_data.total_shift_cash}}</b></b>
 
                         </td>
                         <td>

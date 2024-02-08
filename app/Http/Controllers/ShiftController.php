@@ -34,18 +34,21 @@ class ShiftController extends Controller {
 
 	public function init(Request $request){
 
+		$users = DB::table('users')->select('id','name')->get();
+
 		$input_date = $request->input_date;
+		$user_id = $request->has('user_id')?$request->user_id:0;
 
 		$current_shift = Entry::checkShift();
-		$pod_data = Entry::totalShiftData(1,$input_date);
-		$cabin_data = Entry::totalShiftData(2,$input_date);
-		$bed_data = Entry::totalShiftData(3,$input_date);
+		$pod_data = Entry::totalShiftData(1,$input_date,$user_id);
+		$cabin_data = Entry::totalShiftData(2,$input_date,$user_id);
+		$bed_data = Entry::totalShiftData(3,$input_date,$user_id);
 		
 		$data['pod_data'] = $pod_data;
 		$data['cabin_data'] = $cabin_data;
 		$data['bed_data'] = $bed_data;
 		
-		$data['total_shift_upi'] = $pod_data['total_shift_upi'] + $cabin_data['total_shift_upi'] + $cabin_data['total_shift_upi'];
+		$data['total_shift_upi'] = $pod_data['total_shift_upi'] + $cabin_data['total_shift_upi'] + $bed_data['total_shift_upi'];
         $data['total_shift_cash'] = $pod_data['total_shift_cash'] + $cabin_data['total_shift_cash'] + $cabin_data['total_shift_cash'];
         $data['total_collection'] = $pod_data['total_collection'] + $cabin_data['total_collection'] + $bed_data['total_collection'];
 
@@ -57,6 +60,7 @@ class ShiftController extends Controller {
         $data['shift_date'] = $pod_data['shift_date'];
 
 		$data['success'] = true;
+		$data['users'] = $users;
 		return Response::json($data, 200, []);
 	}
 	

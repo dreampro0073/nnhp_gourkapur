@@ -218,9 +218,7 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
     }
   
     $scope.changeAmountPod = () => {
-
         var total_amount = 0;
-
         if($scope.formData.hours_occ == 6){
            total_amount= $scope.sl_pods.length*299;
         }else if($scope.formData.hours_occ == 12){
@@ -359,21 +357,52 @@ app.controller('entryCtrl', function($scope , $http, $timeout , DBService) {
     }
 });
 
+app.controller('allEntryCtrl', function($scope , $http, $timeout , DBService) {
+    $scope.loading = false;
+    
+    $scope.filter = {};
+    $scope.entries = [{}];
+
+    
+    $scope.init = function () {
+        DBService.postCall($scope.filter, '/api/entries/init-all').then((data) => {
+            if (data.success) {
+                $scope.entries = data.entries;
+                
+            }
+        });
+    }
+    $scope.filterClear = function(){
+        $scope.filter = {};
+        $scope.init();
+    }
+});
+
 app.controller('shiftCtrl', function($scope , $http, $timeout , DBService) {
     $scope.loading = false;
 
     $scope.filter = {
         input_date:'',
+        user_id:'',
     }
+    $scope.users = [];
     $scope.serach = function(){
+        $scope.init();
+    }
+    $scope.clear = function(){
+        $scope.filter = {
+            input_date:'',
+            user_id:'',
+        }
         $scope.init();
     }
     $scope.init = function () {
         $scope.loading = false;
 
         DBService.postCall($scope.filter, '/api/shift/init').then((data) => {
-            if (data.success) {                 
-                $scope.pod_data = data.pod_data ; 
+            if (data.success) {   
+                $scope.users = data.users;              
+                $scope.pod_data = data.pod_data; 
                 $scope.cabin_data = data.cabin_data ; 
                 $scope.bed_data = data.bed_data ; 
 

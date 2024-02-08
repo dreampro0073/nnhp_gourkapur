@@ -33,6 +33,15 @@ class EntryOldController extends Controller {
             "type" => $type,
         ]);
 	}
+	public function allEntries(){
+		$sidebar = 'all-entries';
+        $subsidebar = 'all-entries';
+
+		return view('admin.entries.all_entries', [
+            "sidebar" =>$sidebar,
+            "subsidebar" => $subsidebar,
+        ]);
+	}
 	
 	public function initEntry(Request $request,$type){
 		
@@ -59,6 +68,12 @@ class EntryOldController extends Controller {
 		$entries = $entries->where('checkout_status',0)->where('type',$type);
 		$entries = $entries->orderBy('id', "DESC")->get();
 
+		foreach ($entries as $key => $item) {
+			$bm_amount = DB::table('e_entries')->where('entry_id','=',$item->id)->sum('paid_amount');
+			$item->sh_paid_amount = $item->paid_amount + $bm_amount;
+			$item->check_in = date("d M y",strtotime($item->check_in));
+			$item->checkout_date = date("d M y, h:i A",strtotime($item->checkout_date));
+		}
 
 		$pay_types = Entry::payTypes();
 		$hours = Entry::hours();
@@ -77,10 +92,49 @@ class EntryOldController extends Controller {
 
 		return Response::json($data, 200, []);
 	}
+	public function initAllEntry(Request $request){
+		
+
+		$entries = DB::table('entries')->select('entries.*','users.name as username')->leftJoin('users','users.id','=','entries.delete_by');
+		if($request->unique_id){
+			$entries = $entries->where('entries.unique_id', 'LIKE', '%'.$request->unique_id.'%');
+		}		
+
+		if($request->name){
+			$entries = $entries->where('entries.name', 'LIKE', '%'.$request->name.'%');
+		}		
+		if($request->mobile_no){
+			$entries = $entries->where('entries.mobile_no', 'LIKE', '%'.$request->mobile_no.'%');
+		}		
+		if($request->pnr_uid){
+			$entries = $entries->where('entries.pnr_uid', 'LIKE', '%'.$request->pnr_uid.'%');
+		}		
+		
+		if(Auth::user()->priv != 1){
+			$entries = $entries->where('deleted',0);
+		}
+		
+		$entries = $entries->orderBy('id', "DESC")->get();
+
+		foreach ($entries as $key => $item) {
+			$bm_amount = DB::table('e_entries')->where('entry_id','=',$item->id)->sum('paid_amount');
+			$item->sh_paid_amount = $item->paid_amount + $bm_amount;
+			$item->check_in = date("d M y",strtotime($item->check_in));
+			$item->checkout_date = date("d M y, h:i A",strtotime($item->checkout_date));
+		}
+
+		$data['success'] = true;
+		$data['entries'] = $entries;
+
+		return Response::json($data, 200, []);
+	}
+	
 	public function editEntry(Request $request){
 		$l_entry = Entry::where('id', $request->entry_id)->first();
 
 		$sl_pods = [];
+		$sl_cabins = [];
+		$sl_beds = [];
 
 		if($l_entry){
 			$l_entry->mobile_no = $l_entry->mobile_no*1;
@@ -92,12 +146,29 @@ class EntryOldController extends Controller {
 
 			$l_entry->check_in = date("h:i A",strtotime($l_entry->check_in));
 			$l_entry->check_out =date("h:i A",strtotime($l_entry->check_out));
-			$sl_pods = explode(',', $l_entry->e_ids);
+
+			$e_ids =  explode(',', $l_entry->e_ids);
+			
+			if($l_entry->type == 1){
+				$sl_pods = $e_ids;
+
+			}else if($l_entry->type == 2){
+				$sl_cabins = $e_ids;
+
+			}else{
+				$sl_beds = $e_ids;
+			}
+
+			$bm_amount = DB::table('e_entries')->where('entry_id','=',$l_entry->id)->sum('paid_amount');
+			$l_entry->paid_amount = $l_entry->paid_amount + $bm_amount;
+			$l_entry->bm_amount = $bm_amount;
 		}
 
 		$data['success'] = true;
 		$data['l_entry'] = $l_entry;
 		$data['sl_pods'] = $sl_pods;
+		$data['sl_cabins'] = $sl_cabins;
+		$data['sl_beds'] = $sl_beds;
 		return Response::json($data, 200, []);
 	}
 	public function calCheck(Request $request){
@@ -115,6 +186,9 @@ class EntryOldController extends Controller {
 	}
 
 	public function store(Request $request,$type){
+
+		$user_session_id = Auth::user()->session_id;
+		$user_id = Auth::id();
 
 		$check_shift = Entry::checkShift();
 
@@ -135,44 +209,36 @@ class EntryOldController extends Controller {
 				$entry = Entry::find($request->id);
 				$message = "Updated Successfully!";
 
-				if(Auth::id() != $entry->added_by){
-
-					$entry->e_added_by = Auth::id();
-					$entry->e_user_session_id = Auth::user()->session_id;
-					$entry->e_paid_amount  = $balance_amount;
-
-
-					if($request->e_paid_amount !=0 ){
-						$entry->e_paid_amount  = $request->e_paid_amount;	
-					}
-
+				
+				if($user_session_id != $entry->user_session_id){
+					DB::table('e_entries')->insert([
+						'entry_id' => $entry->id,
+						'added_by' => $user_id,
+						'user_session_id' => $user_session_id,
+						'date' => date("Y-m-d"),
+						'pay_type' => $request->pay_type,
+						'type' => $type,
+						'shift' => $check_shift,
+						'paid_amount' => $request->balance_amount,
+						'created_at' => date("Y-m-d H:i:s"),
+						'current_time' => date("H:i:s"),
+					]);
 				}else{
 					$paid_amount = $paid_amount + $balance_amount;
-
-					if($request->e_paid_amount){
-						$paid_amount = $request->paid_amount - $request->e_paid_amount;
-						
-					}
 					$entry->paid_amount = $paid_amount;
 				}
-				// if($entry){
-					// $old_entry = $entry;
-					// if(Auth::id() != $entry->added_by){
-						
-					// 	$entry = new Entry;
-					// 	$message = "Stored Successfully!";
-					// 	$entry->unique_id = strtotime('now');
-					// 	$entry->old_id = $old_entry->id;
-					// }
-				// }
 			} else {
 				$entry = new Entry;
 				$message = "Stored Successfully!";
 				$entry->unique_id = strtotime('now');
 				$entry->paid_amount = $paid_amount;
 
-				$entry->added_by = Auth::id();
-				$entry->user_session_id = Auth::user()->session_id;
+				$entry->added_by = $user_id;
+				$entry->user_session_id = $user_session_id;
+				$entry->pay_type = $request->pay_type;
+
+				$entry->created_at = date('Y-m-d H:i:s');
+
 			}
 
 			$entry->name = $request->name;
@@ -186,12 +252,10 @@ class EntryOldController extends Controller {
 			}else{
 				$entry->check_in = date("H:i:s");
 			}
-
 			
 			$entry->total_amount = $total_amount;
 			$entry->discount_amount = $request->has('discount_amount')?$request->discount_amount:0;
 
-			$entry->pay_type = $request->pay_type;
 			$entry->remarks = $request->remarks;
 			$entry->shift = $check_shift;
 			$entry->type = $type;
@@ -207,10 +271,6 @@ class EntryOldController extends Controller {
 			$checkout_date = date("Y-m-d H:i:s",strtotime("+".$no_of_min.' minutes',strtotime($checkin_date)));
 
 	        $entry->checkout_date = $checkout_date;
-
-			
-
-
 			if($type ==1){
 				$sl_pods = $request->sl_pods;
 				$entry->e_ids = implode(',', $sl_pods);
@@ -227,6 +287,8 @@ class EntryOldController extends Controller {
 				$entry->e_ids = implode(',', $sl_beds);
 				DB::table("double_beds")->whereIn('id',$sl_beds)->update(['status'=>1]);
 			}
+
+
 
 			
 			$entry->save();
@@ -253,10 +315,7 @@ class EntryOldController extends Controller {
 
     	$now_time = strtotime(date("Y-m-d H:i:s",strtotime("+10 minutes")));
     	$l_entry = Entry::where('id', $request->entry_id)->first();
-
     	$checkout_time = strtotime($l_entry->checkout_date);
-
- 
 
     	if($checkout_time > $now_time){
     		$data['timeOut'] = false;
@@ -271,11 +330,7 @@ class EntryOldController extends Controller {
 			Entry::updateAvailStatus($l_entry->type,$e_ids);    
     	} else {
     		$hour = round(($now_time - $checkout_time)/(60 * 60));
-
-    		// dd($hour);
     		$e_ids = explode(',', $l_entry->e_ids);
-			// dd($l_entry);
-
 
 			$l_entry->mobile_no = $l_entry->mobile_no*1;
 			$l_entry->pnr_uid = $l_entry->pnr_uid;
@@ -312,9 +367,9 @@ class EntryOldController extends Controller {
 		$date = Entry::getPDate();
 
 
-		DB::table('penalties')->insert([
+		DB::table('e_entries')->insert([
 			'entry_id' => $entry->id,
-			'penalty_amount' => $request->balance,
+			'paid_amount' => $request->balance,
 			'pay_type' => $request->pay_type,
 			'type' => $entry->type,
 			'shift' => $check_shift,
@@ -333,11 +388,21 @@ class EntryOldController extends Controller {
     }
     
     public function delete($id){
+
+    	$entry = DB::table('entries')->where('id',$id)->first();
+    	$e_ids = [];
+    	if($entry){
+    		$e_ids = explode(',', $entry->e_ids);
+    	}
+
+    	
     	DB::table('entries')->where('id',$id)->update([
     		'deleted' => 1,
     		'delete_by' => Auth::id(),
     		'delete_time' => date("Y-m-d H:i:s"),
     	]);
+
+		Entry::updateAvailStatus($entry->type,$e_ids);
 
     	$data['success'] = true;
     	$data['message'] = "Successfully";

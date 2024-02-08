@@ -1,13 +1,11 @@
 @extends('admin.layout')
 
 @section('main')
-    <div class="main" ng-controller="entryCtrl" ng-init="type = {{$type}};init();"> 
-        @include('admin.entries.add')
+    <div class="main" ng-controller="allEntryCtrl" ng-init="init();"> 
         <div class="card shadow mb-4 p-4">    
             <div class="filters" style="margin:24px 0;">
                 <form name="filterForm"  novalidate>
                     <div class="row" style="font-size: 14px">
-
                         <div class="col-md-9">
                             <div class="row">
                                 <div class="col-md-2 form-group">
@@ -32,7 +30,7 @@
                         <div class="col-md-3 text-right" style="margin-top: 25px;" class="mb-2">
                             <button type="button" ng-click="init()" class="btn  btn-primary" style="width: 70px;">Search</button>
                             <button type="button" ng-click="filterClear()" class="btn  btn-warning" style="width: 70px;">Clear</button>
-                            <button type="button" ng-click="add()" class="btn  btn-primary" style="width: 70px;">Add</button>
+                            
                         </div>
                     </div>
                 </form>
@@ -45,9 +43,8 @@
                             <th>S.no</th>
                             <th>Bill no</th>
                             <td>
-                                <span ng-if="type == 1">Pod</span>
-                                <span ng-if="type == 2">Cabin</span>
-                                <span ng-if="type == 3">Bed</span>
+                                <span>Type</span>
+                                
                             </td>
                             <th>Name</th>
                             <th>Mobile No</th>
@@ -66,10 +63,16 @@
                         <tr ng-repeat="item in entries " ng-class="{'my_class': item.deleted == 1}">
                             <td>@{{ $index+1 }}</td>
                             <td>@{{ item.unique_id }}</td>
-                            <td>@{{ item.e_ids }}</td>
+                            <td>
+                                <span ng-if="item.type == 1">Pods</span>
+                                <span ng-if="item.type == 2">Single Suit Cabin</span>
+                                <span ng-if="item.type == 3">Double Bed</span>
+                                <span>@{{ item.e_ids }}</span>
+                            </td>
                             <td>@{{ item.name }}</td>
                             <td>@{{ item.mobile_no }}</td>
                             <td>@{{ item.check_in }}/@{{ item.check_out }}</td>
+
                             
                             <td>@{{ item.pnr_uid }}</td>
                             
@@ -89,13 +92,10 @@
                                 </div>
                             </td>
                             @endif 
-                            <td>
-                                <a href="javascript:;" ng-click="checkoutLoker(item.id)" class="btn btn-danger btn-sm">Checkout</a>
-                                <a href="javascript:;" ng-click="edit(item.id)" class="btn btn-warning btn-sm">Edit</a>
+                            <td >
+                               
                                 <a href="{{url('/admin/entries/print')}}/@{{item.id}}" class="btn btn-success btn-sm" target="_blank">Print</a>
-                                @if(Auth::id() !=1)
-                                <!-- <button type="button" ng-click="delete(item.id)" class="btn btn-danger btn-sm">Delete</button> -->
-                                @endif
+                        
                             </td>
                         </tr>
                     </tbody>

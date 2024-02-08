@@ -41,6 +41,11 @@
                             <a href="{{url('/admin/shift/current')}}"><i class="fa fa-lock"></i>Shift</a>
                         </li>
                         @if(Auth::user()->priv == 1)
+                            <li class="@if(isset($sidebar)) @if($sidebar == 'all-entries') active @endif @endif">
+                                <a href="{{url('/admin/all-entries')}}"><i class="fa fa-navicon" aria-hidden="true"></i>All Entries</a>
+                            </li>
+                        @endif
+                        @if(Auth::user()->priv == 1)
                             <li class="@if(isset($sidebar)) @if($sidebar == 'users') active @endif @endif">
                                 <a href="{{url('/admin/users')}}"><i class="fa fa-users" aria-hidden="true"></i>Users</a>
                             </li>

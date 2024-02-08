@@ -34,10 +34,14 @@ Route::group(['middleware'=>'auth'],function(){
 		Route::get('/dashboard',[AdminController::class,'dashboard']);
 		Route::get('/reset-password',[UserController::class,'resetPassword']);
 		Route::post('/reset-password',[UserController::class,'updatePassword']);
+
+		Route::get('/all-entries',[EntryController::class,'allEntries']);
 		
 		Route::group(['prefix'=>"entries"], function(){
 			Route::get('/{type}',[EntryController::class,'index']);
 			Route::get('/print/{id?}', [EntryController::class,'printPost']);
+			
+
 			
 		});		
 
@@ -59,6 +63,7 @@ Route::group(['prefix'=>"api"], function(){
 	
 	Route::group(['prefix'=>"entries"], function(){
 		Route::post('/init/{type}',[EntryController::class,'initEntry']);
+		Route::post('/init-all',[EntryController::class,'initAllEntry']);
 		Route::post('/edit-init',[EntryController::class,'editEntry']);
 		Route::post('/store/{type}',[EntryController::class,'store']);
 		Route::post('/cal-check',[EntryController::class,'calCheck']);
